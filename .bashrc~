@@ -1,0 +1,209 @@
+#-----------------------------------------------------------------------------
+# Defaults: These were here when I came.
+#-----------------------------------------------------------------------------
+
+# If not running interactively, don't do anything
+[ -z "$PS1" ] && return
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ld='ls -alhd'
+alias ll='ls -alh'
+alias la='ls -A'
+alias l='ls -CF'
+alias clojure='java -cp /usr/share/java/jline.jar:/usr/share/java/clojure.jar:/usr/share/java/clojure-contrib.jar:. jline.ConsoleRunner clojure.main'
+alias grep='grep --line-buffered'
+alias rm='rm -i'
+alias rdo='bundle exec'
+alias gits='unbounce-git-sync-branch'
+alias gitc='unbounce-git-create-branch'
+
+# Ruby and Rails aliases.
+alias rails='bundle exec rails'
+alias rake='bundle exec rake'
+alias rspec='bundle exec rspec'
+alias spork='bundle exec spork'
+alias cap='bundle exec cap'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+#-----------------------------------------------------------------------------
+# I got the following from, and mod'd it:
+#   http://www.macosxhints.com/article.php?story=20020716005123797
+#   The following aliases (save & show) are for saving frequently used
+#   directories.  You can save a directory using an abbreviation of your
+#   choosing. Eg. save ms.  You can subsequently move to one of the saved
+#   directories by using cd with the abbreviation you chose. Eg. cd ms.
+#   (Note that no '$' is necessary.)
+#
+if [ ! -f ~/.dirs ]; then
+    touch ~/.dirs;
+fi
+
+alias show='echo "# ~/.dirs:";cat ~/.dirs'
+save(){
+    command sed "/!$/d" ~/.dirs > ~/.dirs1; mv ~/.dirs1 ~/.dirs; echo "$@"=\"`pwd`\" >> ~/.dirs; source ~/.dirs ;
+}
+source ~/.dirs
+
+# Sets the bash option so that no '$' is required when using the above facility.
+shopt -s cdable_vars
+
+rename-terminal () {
+    echo -n -e "\033]0;$1\007"
+}
+
+#-----------------------------------------------------------------------------
+# Setup bash colors.
+#
+# Colors:           Order:
+# a = black         DIR
+# b = red           SYM_LINK
+# c = green         SOCKET
+# d = brown         PIPE
+# e = blue          EXE
+# f = magenta       BLOCK_SP
+# g = cyan          CHAR_SP
+# h = light gray    EXE_SUID
+# x = default       EXE_GUID
+#                   DIR_STICKY
+#                   DIR_WO_STICKY
+#
+# export LSCOLORS="XxXxXxXxXxXxXxXxXxXxXx"
+#
+export LSCOLORS="GxGxxxxxCxxxxxxxxxxxxx"
+export LSOPTIONS="--color=auto"
+export CLICOLOR="Yes"
+
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+export TERM=xterm-256color
+export JAVA_HOME=/usr/lib/jvm/java-6-openjdk/jre
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm" # Load RVM function
+
+uname=`uname -s`
+if [ $uname = 'Darwin' ]; then # Mac OSX
+    alias mysql="/usr/local/mysql/bin/mysql"
+    alias xterm="xterm -rightbar -bg black -fg white -geometry 80x35"
+    export PATH=${PATH}:/Users/aoman/Source/android-sdk-mac_x86/tools:/Users/aoman/Source/android-sdk-mac_x86/platform-tools:/usr/local:/Users/aoman/Scripts:/opt/local/bin
+    export JAVA_HOME="/Library/Java/Home"
+    source /usr/local/etc/bash_completion.d/git-completion.bash
+    alias emacs-server="/usr/local/Cellar/emacs/24.1/bin/emacs-24.1 --daemon"
+    alias emacs="/usr/local/Cellar/emacs/24.1/bin/emacsclient"
+
+    # This path doesn't actually work?
+    # source `brew --prefix git`/etc/bash_completion.d/git-completion.bash
+
+    export gempath="/Library/Ruby/Gems/1.8/gems/"
+    export DYLD_LIBRARY_PATH=/usr/local/mysql/lib:$DYLD_LIBRARY_PATH
+else # Linux
+    export PATH=${PATH}:/home/aoman/Source/android-sdk-linux_86/tools:/home/aoman/Source/android-sdk-linux_86/platform-tools:/home/aoman/scripts
+fi
+
+source ~/Dropbox/dot-files/bash_colors.sh
+
+# Test out colors when using different color schemes.
+#export PS1="\
+#\[$black\]black\[$color_reset\]\
+#\[$red\]red\[$color_reset\]\
+#\[$green\]green\[$color_reset\]\
+#\[$yellow\]yellow\[$color_reset\]\
+#\[$blue\]blue\[$color_reset\]\
+#\[$purple\]purple\[$color_reset\]\
+#\[$cyan\]cyan\[$color_reset\]\
+#\[$white\]white\[$color_reset\]\
+#\
+#\[$hi_black\]black\[$color_reset\]\
+#\[$hi_red\]red\[$color_reset\]\
+#\[$hi_green\]green\[$color_reset\]\
+#\[$hi_yellow\]yellow\[$color_reset\]\
+#\[$hi_blue\]blue\[$color_reset\]\
+#\[$hi_purple\]purple\[$color_reset\]\
+#\[$hi_cyan\]cyan\[$color_reset\]\
+#\[$hi_white\]white\[$color_reset\]\
+# \
+#"
+
+export PS1="\
+\[$black\][\
+\[$purple\]\u\
+\[$black\]|\
+\[$green\]\w\
+\[$black\]|\
+\[$blue\]\$(__git_ps1 %s)\
+\[$black\]|\
+\[$red\]\$(rvm current)\
+\[$black\]]
+\[$black\]↳\[$color_reset\] "
+
+export EDITOR=emacs
+
+PATH=/usr/local/bin:$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting

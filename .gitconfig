@@ -1,0 +1,15 @@
+[user]
+	name = GrooveStomp
+	email = aaron.oman@gmail.com
+[achievement]
+	upload = true
+[color]
+	ui = auto
+[diff]
+	renames = copies
+[core]
+	whitespace = nowarn
+[alias]
+	plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[merge]
+	conflictstyle = diff3
