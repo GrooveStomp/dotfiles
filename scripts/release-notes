@@ -1,0 +1,389 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'date'
+require 'tempfile'
+require 'byebug'
+
+# Check whether this file is being run as a script.
+exit(0) unless __FILE__ == $0
+script_name = File.basename(__FILE__)
+options = {}
+
+#-------------------------------------------------------------------------------
+# Usage and arg parsing.
+#-------------------------------------------------------------------------------
+
+opts = OptionParser.new do |opts|
+  opts.banner = <<USAGE
+Usage: #{script_name} [options] date mogo_root
+
+Prepare information for release notes.
+Use somogo-cli to collect information locally, then collect/chop/dice that all
+up for presentation within Asana.
+Adding to Asana will probably be a manual process.
+
+date: Must be parsable by Ruby's Date class.
+      branches.
+
+mogo_root:
+      Path to directory containing Mogo code repos.
+      eg.: /home/bobby/code/mogo
+
+NOTE: You must define MOGO_SERVICES before invoking this script!
+      See somogo-cli --help for more information.
+
+Options:
+     --help: Show this help text
+
+Examples:
+USAGE
+
+  opts.on('--help', '-h', 'Show this help text') { puts opts; exit }
+  opts.on('--banners', 'Show visual banners for improved readability') { |o| options[:banner] = o }
+end
+
+opts.parse!
+
+(puts opts; exit) if ARGV.count < 2
+
+# ARGV
+date = Date.parse(ARGV[0])
+if ENV['MOGO_SERVICES'].nil? || ENV['MOGO_SERVICES'].empty?
+  puts "MOGO_SERVICES must be defined."
+  puts "Try #{script_name} --help"
+end
+
+mogo_services = ENV['MOGO_SERVICES']
+mogo_root = ARGV[1]
+
+#-------------------------------------------------------------------------------
+# Auxiliary Functions
+#-------------------------------------------------------------------------------
+
+def log_info(tempfile_name, path:nil)
+  file = Tempfile.new(tempfile_name)
+  file.close
+
+  if path
+    FileUtils.cd(path)
+  end
+
+  yield file
+
+  result = `cat #{file.path}`
+  file.unlink
+  result
+end
+
+#-------------------------------------------------------------------------------
+# Updated unit files.
+#-------------------------------------------------------------------------------
+
+path = File.join(mogo_root, 'coreos-files')
+
+updated_unit_files = log_info('updated_unit_files', path: path) do |t|
+  branch = `git status`.match(/dev/).to_s
+  if branch != 'dev'
+    puts "coreos-files must be on branch `dev' but found branch `#{branch}'"
+    exit(1)
+  end
+  `git checkout dev > /dev/null 2>&1`
+  `git pull origin dev > /dev/null 2>&1`
+  `git log --name-status --since #{date} services > #{t.path} 2>&1`
+end
+
+#-------------------------------------------------------------------------------
+# System changes.
+#
+# NOTE: Ignore changes in coreos-files for the `services' directory!
+#-------------------------------------------------------------------------------
+
+path = File.join(mogo_root, 'coreos-files')
+
+system_changes = log_info('system_changes', path: path) do |t|
+  branch = `git status`.match(/dev/).to_s
+  if branch != 'dev'
+    puts "coreos-files must be on branch `dev' but found branch `#{branch}'"
+    exit(1)
+  end
+  `git checkout dev > /dev/null 2>&1`
+  `git pull origin dev > /dev/null 2>&1`
+  `git log --name-status --since #{date} > #{t.path} 2>&1`
+end
+
+path = File.join(mogo_root, 'haproxy')
+
+system_changes += log_info('system_changes', path: path) do |t|
+  branch = `git status`.match(/master/).to_s
+  if branch != 'master'
+    puts "haproxy must be on branch `master' but found branch `#{branch}'"
+    exit(1)
+  end
+  `git checkout master > /dev/null 2>&1`
+  `git pull origin master > /dev/null 2>&1`
+  `git log --name-status --since #{date} > #{t.path} 2>&1`
+end
+
+path = File.join(mogo_root, 'rabbitmq')
+
+system_changes += log_info('system_changes', path: path) do |t|
+  branch = `git status`.match(/dev/).to_s
+  if branch != 'dev'
+    puts "rabbitmq must be on branch `dev' but found branch `#{branch}'"
+    exit(1)
+  end
+  `git checkout dev > /dev/null 2>&1`
+  `git pull origin dev > /dev/null 2>&1`
+  `git log --name-status --since #{date} > #{t.path} 2>&1`
+end
+
+#-------------------------------------------------------------------------------
+# Updated images.
+#-------------------------------------------------------------------------------
+
+updated_container_images = log_info('updated_container_images') do |t|
+  services = mogo_services.clone
+  services = services.gsub(/coreos-files,/, '')
+  services = services.gsub(/coreos-files/, '')
+  services = services.gsub(/schema_manager,/, '')
+  services = services.gsub(/schema_manager/, '')
+
+  somogo = `which somogo`
+  if somogo.empty?
+    puts "Can't find somogo-cli executable"
+    exit(1)
+  end
+  `MOGO_SERVICES=#{services} somogo git-drop 2>&1`
+  `MOGO_SERVICES=#{services} somogo x git checkout dev 2>&1`
+  `MOGO_SERVICES=#{services} somogo x git pull origin dev 2>&1`
+  `MOGO_SERVICES=#{services} somogo x git log --since #{date} -n 1 > #{t.path} 2>&1`
+end
+
+#-------------------------------------------------------------------------------
+# Env vars.
+#-------------------------------------------------------------------------------
+
+service_env_vars = log_info('service_env_vars') do |t|
+  `MOGO_SERVICES=#{mogo_services} somogo x --shell "grep -r ENV * | grep -v 'env/' | grep -v spec | grep -v Dockerfile | grep -v config.ru | grep -v settings.yaml | grep -v newrelic.yml | grep -v *.md" > #{t.path} 2>&1`
+end
+
+path = File.join(mogo_root, 'coreos-files')
+unit_file_vars = log_info('unit_file_vars', path: path) do |t|
+  `grep -r etcdctl services > #{t.path} 2>&1`
+end
+
+#local HOST_AVAILABLE=$(ping staging-9a)
+etcdctl_values = log_info('etcdctl_values') do |t|
+  `ssh -i ~/.ssh/developer.pem developer@AMZN-CO08A.mogo.lan "etcdctl ls --recursive -p | grep -v '/$' | xargs -n 1 -I% sh -c 'echo -n %:; etcdctl get %;'" > #{t.path}`
+end
+
+#-------------------------------------------------------------------------------
+# Parsing system changes.
+#-------------------------------------------------------------------------------
+
+system_changes_result = []
+new_services = []
+updated_unit_files = []
+read_commit = false
+cached_lines = []
+system_changes.each_line do |line|
+  if line.start_with?('Merge:') || line.start_with?('Author:') || line.start_with?('Date:')
+    next
+  end
+
+  if line.match(/commit /)
+    system_changes_result += cached_lines
+    read_commit = true
+    cached_lines = []
+    next
+  end
+
+  if line.match(/Merge pull request/)
+    read_commit = false
+    cached_lines = []
+    next
+  end
+
+  if read_commit
+    match_data = /M\s+services\/(\w+)@?.service/.match(line)
+    if match_data
+      updated_unit_files << match_data[1]
+      read_commit = false
+      cached_lines = []
+      next
+    end
+
+    match_data = /A\s+services\/(\w+)@?.service/.match(line)
+    if match_data
+      new_services << match_data[1]
+      read_commit = false
+      cached_lines = []
+      next
+    end
+
+    cached_lines << line
+
+  end
+end
+
+if options[:banner]
+  puts "-"*80
+  puts "System changes (service files, etcd keys and values, etc.):"
+  puts "-"*80
+else
+  puts '!@#$' " system_changes"
+end
+system_changes_result.uniq.each { |s| puts s }
+
+if options[:banner]
+  puts "-"*80
+  puts "Services with updated unit files in this release:"
+  puts "-"*80
+else
+  puts '!@#$' " updated_unit_files"
+end
+updated_unit_files.uniq.each { |s| puts s }
+
+if options[:banner]
+  puts "-"*80
+  puts "New services deployed in this release:"
+  puts "-"*80
+else
+  puts '!@#$' " new_services"
+end
+new_services.uniq.each { |s| puts s }
+
+#-------------------------------------------------------------------------------
+# Parsing services with updated container images.
+#-------------------------------------------------------------------------------
+
+
+
+containers = []
+new_service = false
+service = nil
+has_commit = false
+prev_line = ""
+updated_container_images.each_line do |line|
+  if line.match(/-----/)
+    containers << service if has_commit
+    new_service = !new_service
+    has_commit = false
+    prev_line = line
+  elsif new_service
+    res = line.match(/(\w+):/)
+    if res
+      service = res[1]
+      if service == "files"
+        puts
+        puts
+        puts "AARON: Service: #{service}"
+        puts "AARON: #{prev_line}"
+        puts "AARON: #{line}"
+        puts
+        puts
+      end
+      prev_line = line
+    else
+      service = 'DELETE_ME'
+      prev_line = line
+    end
+  elsif line.start_with?('commit')
+    has_commit = true
+    prev_line = line
+  end
+end
+
+if options[:banner]
+  puts "-"*80
+  puts "Services with updated container images this release:"
+  puts "-"*80
+else
+  puts '!@#$' " updated_images"
+end
+containers.uniq.each { |c| puts c }
+
+#-------------------------------------------------------------------------------
+# Parsing env vars and comparing the data.
+#-------------------------------------------------------------------------------
+
+unit_file_vars_hash = {}
+unit_file_vars.each_line do |line|
+  match_result = /^services\/(\w+)@?.service.*-e (.*)=`etcdctl get (.*)`/.match(line)
+
+  if match_result
+    unit_file_vars_hash[match_result[2]] = { value: match_result[3], service:  match_result[1] }
+  end
+end
+
+etcdctl_values_hash = {}
+etcdctl_values.each_line do |line|
+  match_result = /^(.*?):(.*)$/.match(line)
+
+  if match_result
+    etcdctl_values_hash[match_result[1]] = match_result[2]
+  end
+end
+
+final_env_vars_hash = {}
+new_service = false
+service = ""
+service_env_vars.each_line do |line|
+  if line.match(/----------/)
+    new_service = !new_service
+  elsif new_service
+    service = line.match(/(\w+):/)[1]
+  else
+    match_results = /ENV\[(?:'|")(\w+)(?:'|")\]/.match(line)
+    if (match_results && match_results.length > 1)
+      for i in 1..(match_results.length - 1)
+        var = match_results[i]
+        if !final_env_vars_hash.has_key?(var)
+          final_env_vars_hash[var] = [service]
+        else
+          (final_env_vars_hash[var] << service).uniq!
+        end
+      end
+    end
+  end
+end
+
+if options[:banner]
+  puts "-"*80
+  puts "Env vars explicitly referenced by services (instead of using Somogo::Settings)"
+  puts "-"*80
+else
+  puts '!@#$%' " service_env_vars"
+end
+# Print out env vars explicitly used in Ruby source code.
+final_env_vars_hash.each do |var, services|
+  printf("%-45s %s\n", var, services.join(','))
+end
+
+if options[:banner]
+  puts "-"*80
+  puts "Etcdctl keys explicitly referenced in unit files but not found on Staging"
+  puts "-"*80
+else
+  puts '!@#$' " missing_etcdctl_keys"
+end
+# Diff unit file values against etcdctl keys.
+unit_file_vars_hash.each do |var, h|
+  if !etcdctl_values_hash.has_key?(h[:value])
+    puts "Expected etcdctl key for `#{h[:value]}', used by #{h[:service]}"
+  end
+end
+
+if options[:banner]
+  puts "-"*80
+  puts "Explicitly referenced env vars not configured in unit files"
+  puts "-"*80
+else
+  puts '!@#$' " env_vars_missing_in_unit_files"
+end
+# Diff explicit env vars against unit files.
+final_env_vars_hash.each do |var, services|
+  if !unit_file_vars_hash.has_key?(var)
+    puts "Expected unit file env var declaration for `#{var}'"
+  end
+end

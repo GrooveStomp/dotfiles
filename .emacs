@@ -1,0 +1,251 @@
+;; Global vars.
+(defvar *emacs-load-start* (current-time))
+
+(require 'cl)
+
+;;; Investigation: Auto-install dependencies
+;;; See: https://stackoverflow.com/a/10093312
+
+;; ;; Lit the packages we want to install.
+;; (setq package-list '(autumn-light-theme
+;;                      dirtree
+;;                      labburn-theme
+;;                      mellow-theme
+;;                      multi-term
+;;                      org-bullets
+;;                      paredit
+;;                      tramp
+;;                      tree-mode
+;;                      windata
+;;                      go-mode))
+
+;; ;; Set all package repositories we will use.
+;; (setq package-archives '(("elpa" . "http://tromey.com/elpa/")
+;;                          ("gnu" . "http://elpa.gnu.org/packages/")
+;;                          ("marmalade" . "http://marmalade-repo.org/packages/")))
+
+;; ;; Activate all packages.
+;; (package-initialize)
+
+;; ;; Fetch the list of available packages.
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
+
+;; ;; Install the missing packages.
+;; (dolist (package package-list)
+;;   (unless (package-installed-p package)
+;;     (package-install package)))
+
+(global-unset-key "\C-h\C-n") ; Emacs news.
+(global-unset-key "\C-hn")    ; Emacs news.
+
+(setq-default fill-column 80)
+(setq initial-major-mode 'org-mode)
+(setq initial-scratch-message "\
+# Scratch buffer, text-mode..
+# Remember, you are awesome. Stick with it!")
+(setq ring-bell-function 'ignore)
+
+;; ELPA Package manager setup.
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
+;; Always follow symlinks.
+(setq vc-follow-symlinks t)
+;; General Emacs settings.
+(set-default 'truncate-lines t)
+(setq-default indent-tabs-mode nil
+              tab-width 2)
+(setq inhibit-startup-screen t ; Disable splash screen.
+      column-number-mode t ; Show column numbers
+      indent-line-function 'insert-tab)
+
+;; Case-sensitive query-replace.
+;; https://stackoverflow.com/a/5346216
+(defadvice replace-string (around turn-off-case-fold-search)
+  (let ((case-fold-search nil))
+    ad-do-it))
+(ad-activate 'replace-string)
+
+(transient-mark-mode t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Set file backup scheme.
+(setq backup-by-copying t
+      backup-directory-alist '(("." . "~/.emacs-saves"))
+      delete-old-versions t
+      kept-new-versions 6
+      kept-old-versions 2
+      version-control t
+      ;; Make normal search work like dired-isearch-filenames when in dired.
+      dired-isearch-filenames t)
+
+;; Dependencies.
+(require 'paredit)
+;(require 'highlight-parentheses)
+(require 'tree-mode)
+(require 'windata)
+(require 'multi-term)
+(require 'tramp)
+(require 'dirtree)
+;(require 'auto-complete-exuberant-ctags)
+(autoload 'dirtree "dirtree" "Add directory to tree view" t)
+
+; Set the tramp remote connection default type.
+(setq tramp-default-method "sshx")
+
+; Enable auto-complete.
+;(ac-exuberant-ctags-setup)
+(setq multi-term-program (getenv "SHELL"))
+;(auto-complete-mode)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("80ae3a89f1eca6fb94a525004f66b544e347c6f756aaafb728c7cdaef85ea1f5" "3e83abe75cebf5621e34ce1cbe6e12e4d80766bed0755033febed5794d0c69bf" "fc0c179ce77997ecb6a7833310587131f319006ef2f630c5a1fec1a9307bff45" "227edf860687e6dfd079dc5c629cbfb5c37d0b42a3441f5c50873ba11ec8dfd2" "83faf27892c7119f6016e3609f346d3dae3516dede8fd8a5940373d98f615b4e" "0c29db826418061b40564e3351194a3d4a125d182c6ee5178c237a7364f0ff12" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "96998f6f11ef9f551b427b8853d947a7857ea5a578c75aa9c4e7c73fe04d10b4" "3cc2385c39257fed66238921602d8104d8fd6266ad88a006d0a4325336f5ee02" "72a81c54c97b9e5efcc3ea214382615649ebb539cb4f2fe3a46cd12af72c7607" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "5dd70fe6b64f3278d5b9ad3ff8f709b5e15cd153b0377d840c5281c352e8ccce" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" "58c6711a3b568437bab07a30385d34aacf64156cc5137ea20e799984f4227265" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" "e0d42a58c84161a0744ceab595370cbe290949968ab62273aed6212df0ea94b4" "e9776d12e4ccb722a2a732c6e80423331bcb93f02e089ba2a4b02e85de1cf00e" "3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" default)))
+ '(package-selected-packages
+   (quote
+    (autumn-light-theme org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit)))
+ '(rainbow-identifiers-choose-face-function (quote rainbow-identifiers-cie-l*a*b*-choose-face))
+ '(rainbow-identifiers-cie-l*a*b*-color-count 1024)
+ '(rainbow-identifiers-cie-l*a*b*-lightness 80)
+ '(rainbow-identifiers-cie-l*a*b*-saturation 25))
+
+;; Custom functions.
+(load-library "~/.emacs.d/support.el")
+
+(windmove-default-keybindings)
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+; Bright-red TODOs
+(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode ruby-mode))
+(make-face 'font-lock-fixme-face)
+(make-face 'font-lock-study-face)
+(make-face 'font-lock-important-face)
+(make-face 'font-lock-note-face)
+(mapc (lambda (mode)
+        (font-lock-add-keywords
+         mode
+         '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+           ("\\<\\(FIXME\\)" 1 'font-lock-fixme-face t)
+           ("\\<\\(STUDY\\)" 1 'font-lock-study-face t)
+           ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+      fixme-modes)
+(modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
+(modify-face 'font-lock-study-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-important-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
+
+
+(global-set-key (kbd "C-o")     'open-next-line)
+(global-set-key (kbd "M-o")     'open-previous-line)
+(global-set-key (kbd "RET")     'newline-and-indent)
+(global-set-key (kbd "C-x C-o") 'dirtree-show)
+(global-set-key (kbd "M-\\")    'delete-horizontal-space-forward)
+(global-set-key (kbd "C-c C-w") 'copy-word)
+(global-set-key (kbd "C-c C-l") 'copy-line)
+(global-set-key (kbd "C-c C-p") 'copy-paragraph)
+(global-set-key (kbd "M-n")     'forward-paragraph)
+(global-set-key (kbd "M-p")     'backward-paragraph)
+(global-set-key (kbd "M-Q")     'unfill-paragraph)
+
+;; Enable/Disable font-lock. (Syntax highlighting.)
+(if (use-theme-p)
+    (global-font-lock-mode 1)
+  (global-font-lock-mode -1))
+
+;; Color Themes
+;; https://github.com/owainlewis/emacs-color-themes
+;; (add-to-list 'custom-theme-load-path "~/.emacs.d/elpa/sublime-themes-20160111.122/")
+(cond ((and (use-theme-p) (display-graphic-p))
+       (load-theme 'mellow t)) ; GUI theme.
+      ((use-theme-p)
+       (load-theme 'labburn t))) ; TUI theme.      
+
+;; GUI Options.
+(if (display-graphic-p)
+    (progn
+      (scroll-bar-mode -1)
+      (tool-bar-mode -1)))
+
+(menu-bar-mode -1)
+(set-face-attribute 'default nil :font "Liberation Mono 13")
+
+;; Configure file extensions with specific modes.
+(mapcar
+ (lambda (file-ext) (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
+ '("\\.emacs$" "\\.cl$" "\\.asd$" "\\.el$"))
+
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
+
+;; Finish calculating total load time for .emacs.
+(defvar *finish-time* (current-time))
+(message "My .emacs loaded in %fs"
+         (let (finish-time (current-time))
+           (- (+ (first *finish-time*)
+                 (second *finish-time*))
+              (+ (first *emacs-load-start*)
+                 (second *emacs-load-start*)))))
+(put 'narrow-to-region 'disabled nil)
+
+;;------------------------------------------------------------------------------
+;; Major Mode Hooks
+;;------------------------------------------------------------------------------
+
+(add-hook 'go-mode-hook
+          (add-hook 'before-save-hook 'gofmt-before-save))
+
+
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (setq c-default-style "linux")
+            (setq tab-width 8)
+            (setq c-basic-offset 8)
+            ;; Make `case' statements in `switch' blocks indent normally.
+            (c-set-offset 'case-label '+)))
+
+(add-hook 'sh-mode-common-hook
+          (lambda ()
+            (setq tab-width 8)
+            (setq c-basic-offset 8)
+            ;; Make `case' statements in `switch' blocks indent normally.
+            (c-set-offset 'case-label '+)))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-bullets-mode -1)
+            (org-indent-mode 1)
+            (local-set-key "\C-cl" 'org-store-link)
+            (local-set-key "\C-ca" 'org-agenda)
+            (local-set-key "\C-cb" 'org-iswitchb)
+            (setq org-log-done 'time)
+            (setq org-todo-keywords
+                  '((sequence "TODO" "STARTED" "WAITING" "DEFERRED" "|" "DONE" "CANCELLED")))
+            ;;(setq org-log-done t)
+            (setq org-ellipsis " ▼")
+            (setq org-src-fontify-natively t)
+            (setq org-src-tab-acts-natively t)
+            (setq org-src-window-setup 'current-window)
+            (load-library "find-lisp")
+            ;; Get initial list of agenda files.
+            (setq aaron-agenda-files (find-lisp-find-files "~/notes" "\.org$"))
+            ;; Filter out syncthing backed-up files.
+            (setq aaron-agenda-files
+                  (remove-if (lambda (path)
+                               (string-match "\.stversions" path))
+                             aaron-agenda-files))
+            ;; DEBUG: Show value of aaron-agenda-files
+            ;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
+            (setq org-agenda-files aaron-agenda-files)))

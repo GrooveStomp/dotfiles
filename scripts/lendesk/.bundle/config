@@ -1,0 +1,4 @@
+---
+BUNDLE_PATH: "/Users/aaron/code/dotfiles/scripts/lendesk/.env/gems"
+BUNDLE_BIN: "/Users/aaron/code/dotfiles/scripts/lendesk/.env/bin"
+BUNDLE_DISABLE_SHARED_GEMS: "true"

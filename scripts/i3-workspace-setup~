@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+i3-msg 'workspace 1; append_layout /home/aaron/.i3/workspace-1.json'
+i3-msg 'workspace 2; append_layout /home/aaron/.i3/workspace-2.json'
+i3-msg 'workspace 3; append_layout /home/aaron/.i3/workspace-3.json'
+i3-msg 'workspace 4; append_layout /home/aaron/.i3/workspace-4.json'
+i3-msg 'workspace 5; append_layout /home/aaron/.i3/workspace-5.json'
