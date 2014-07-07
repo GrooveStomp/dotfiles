@@ -28,6 +28,10 @@ export CLASSPATH=/usr/local/bin/jdbc.jar:.
 
 export PATH=$PATH:${HOME}/script:${HOME}/bin
 export PATH=${HOME}/.cabal/bin:$PATH
+export PATH=/opt/cabal/1.20/bin:$PATH
+export PATH=/opt/ghc/7.8.2/bin:$PATH
+export PATH=/opt/happy/1.19.3:$PATH
+export PATH=/opt/alex/3.1.3/bin:$PATH
 export PATH=${JAVA_HOME}/bin:$PATH
 
 export EDITOR=vim
