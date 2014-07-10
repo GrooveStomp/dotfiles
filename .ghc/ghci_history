@@ -1,9 +1,0 @@
-:q
-:hoogle (a -> m b) -> [a] -> [b]
-:q
-:hoogle data
-:hoogle (a -> m b) -> [a] -> [b]
-:q
-:q
-:q
-:q
