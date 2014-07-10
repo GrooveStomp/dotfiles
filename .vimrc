@@ -75,6 +75,17 @@ let g:tagbar_autofocus = 1
 let g:haddock_browser = '/usr/bin/firefox'
 let g:haddock_docdir = '/usr/share/doc/ghc-haddock'
 
+let g:tagbar_type_ruby = {
+    \ 'kinds' : [
+        \ 'm:modules',
+        \ 'c:classes',
+        \ 'd:describes',
+        \ 'C:contexts',
+        \ 'f:methods',
+        \ 'F:singleton methods'
+    \ ]
+\ }
+
 colorscheme solarized
 let term_bg_color = readfile('/home/aoman/.backup/.termbg', '', 1)[0]
 if term_bg_color == "light"
