@@ -1,4 +1,5 @@
 (require 'cl)
+(require 'term)
 
 ;; ELPA Package manager setup.
 (package-initialize)
@@ -44,9 +45,6 @@
 (require 'windata)
 (require 'dirtree)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
-(global-set-key "\C-o" 'dirtree-show)
-; Set goto-line key shortcut.
-(global-set-key "\C-x\C-l" 'goto-line)
 
 ; Set the font face.
 (set-face-attribute 'default t :font "Ubuntu Mono 12")
@@ -79,6 +77,51 @@
             (paredit-mode t)
             (setq hl-paren-colors '("red1" "cyan1" "yellow1" "green1" "cyan1" "slateblue1" "magenta1" "purple"))
             (slime-mode t)))
+
+
+
+;; Custom functions.
+;; These should go into a new file and be loaded separately.
+
+;; Behave like vi's o command
+(defun open-next-line (arg)
+  "Move to the next line and then opens a line.
+    See also `newline-and-indent'."
+  (interactive "p")
+  (end-of-line)
+  (open-line arg)
+  (next-line 1)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+;; Behave like vi's O command
+(defun open-previous-line (arg)
+  "Open a new line before the current one.
+     See also `newline-and-indent'."
+  (interactive "p")
+  (beginning-of-line)
+  (open-line arg)
+  (when newline-and-indent
+    (indent-according-to-mode)))
+
+(global-set-key (kbd "C-o") 'open-next-line)
+(global-set-key (kbd "M-o") 'open-previous-line)
+(global-set-key (kbd "RET") 'newline-and-indent)
+(global-set-key "\C-x\C-o" 'dirtree-show)
+(global-set-key "\C-x\C-l" 'goto-line)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector ["black" "red" "green" "yellow" "deep sky blue" "plum3" "cyan" "white"]))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
