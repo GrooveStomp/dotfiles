@@ -19,6 +19,7 @@
       column-number-mode t ; Show column numbers
       indent-line-function 'insert-tab)
 
+;; GUI Options.
 (global-font-lock-mode 1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -115,7 +116,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["black" "red" "green" "yellow" "deep sky blue" "plum3" "cyan" "white"]))
+ '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"]))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
