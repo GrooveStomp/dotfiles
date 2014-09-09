@@ -1,5 +1,4 @@
 (require 'cl)
-(require 'term)
 
 ;; ELPA Package manager setup.
 (package-initialize)
@@ -26,7 +25,8 @@
 (tool-bar-mode -1)
 
 (transient-mark-mode t)
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(remove-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Set file backup scheme.
 (setq backup-by-copying t
@@ -44,8 +44,14 @@
 ;(require 'slime-autoloads)
 (require 'tree-mode)
 (require 'windata)
+(require 'multi-term)
+(require 'tramp)
 (require 'dirtree)
+(setq multi-term-program "/bin/bash")
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
+
+; Set the tramp remote connection default type.
+(setq tramp-default-method "sshx")
 
 ; Set the font face.
 (set-face-attribute 'default t :font "Ubuntu Mono 12")
@@ -84,7 +90,7 @@
 ;; Custom functions.
 ;; These should go into a new file and be loaded separately.
 
-;; Behave like vi's o command
+;; Behave like vi's o command.
 (defun open-next-line (arg)
   "Move to the next line and then opens a line.
     See also `newline-and-indent'."
@@ -95,7 +101,7 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
-;; Behave like vi's O command
+;; Behave like vi's O command.
 (defun open-previous-line (arg)
   "Open a new line before the current one.
      See also `newline-and-indent'."
@@ -105,11 +111,20 @@
   (when newline-and-indent
     (indent-according-to-mode)))
 
+;; Delete all whitespace from point to next word.
+(defun delete-horizontal-space-forward ()
+  "*Delete all spaces and tabs after point."
+  (interactive "*")
+  (delete-region (point) (progn (skip-chars-forward " \t") (point))))
+
 (global-set-key (kbd "C-o") 'open-next-line)
 (global-set-key (kbd "M-o") 'open-previous-line)
 (global-set-key (kbd "RET") 'newline-and-indent)
 (global-set-key "\C-x\C-o" 'dirtree-show)
 (global-set-key "\C-x\C-l" 'goto-line)
+(global-set-key (kbd "M-\\") 'delete-horizontal-space-forward)
+
+(windmove-default-keybindings)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -122,7 +137,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(term-color-blue ((t (:background "light sky blue" :foreground "light sky blue"))))
+ '(term-color-green ((t (:background "chartreuse2" :foreground "chartreuse2"))))
+ '(term-color-magenta ((t (:background "plum3" :foreground "plum3")))))
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))

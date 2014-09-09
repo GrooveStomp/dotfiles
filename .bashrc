@@ -90,3 +90,6 @@ function compose_prompt() {
 }
 
 PROMPT_COMMAND=compose_prompt
+
+# added by travis gem
+[ -f /home/aoman/.travis/travis.sh ] && source /home/aoman/.travis/travis.sh

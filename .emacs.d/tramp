@@ -1,8 +1,35 @@
-;; -*- emacs-lisp -*- <12/09/28 12:37:03 /Users/aoman/.emacs.d/tramp>
+;; -*- emacs-lisp -*- <14/08/25 10:09:12 /home/aoman/.emacs.d/tramp>
 ;; Tramp connection history.  Don't change this file.
 ;; You can delete it, forcing Tramp to reapply the checks.
 
-((["scpc" nil "production" nil]
-  nil)
- (["scpc" "unbounce" "app-2-us-west.unbounce.com" nil]
-  nil))
+((["sshx" "aoman" "app-test-webapp.us-west-1.unbounce.net" nil nil]
+  ("uname" "Linux 3.2.0-65-virtual")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("file-exists" "test -e")
+  ("readlink" "\\readlink")
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 2106)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl"))
+ (["sudo" "root" "work" nil nil]
+  ("uname" "Linux 3.8.0-44-generic")
+  ("test" "test")
+  ("remote-path"
+   ("/bin" "/usr/bin" "/sbin" "/usr/sbin" "/usr/local/bin" "/usr/local/sbin"))
+  ("remote-shell" "/bin/sh")
+  ("busybox" nil)
+  ("file-exists" "test -e")
+  ("readlink" "\\readlink")
+  ("stat" "\\stat")
+  ("id" "/usr/bin/id")
+  ("gid-integer" 0)
+  ("uid-integer" 0)
+  ("perl-file-spec" t)
+  ("perl-cwd-realpath" t)
+  ("perl" "\\perl")))

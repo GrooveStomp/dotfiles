@@ -34,7 +34,7 @@ export PATH=/opt/happy/1.19.3:$PATH
 export PATH=/opt/alex/3.1.3/bin:$PATH
 export PATH=${JAVA_HOME}/bin:$PATH
 
-export EDITOR=vim
+export EDITOR=emacs
 
 export PATH="/usr/local/heroku/bin:$PATH"
 export PATH="~/.nodejs/bin:$PATH"
