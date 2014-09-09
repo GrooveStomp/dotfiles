@@ -2,3 +2,5 @@
 !.vim/bundle/README
 .ghc/*
 !.ghc/ghci.conf
+.emacs.d/auto-save-list/
+.emacs.d/session.*
