@@ -9,12 +9,12 @@
 #umask 022
 
 # if running bash
-#if [ -n "$BASH_VERSION" ]; then
+if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
-#    if [ -f "$HOME/.bashrc" ]; then
-#	. "$HOME/.bashrc"
-#    fi
-#fi
+    if [ -f "$HOME/.bashrc" ]; then
+	      . "$HOME/.bashrc"
+    fi
+fi
 
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
@@ -33,15 +33,15 @@ export PATH=/opt/ghc/7.8.2/bin:$PATH
 export PATH=/opt/happy/1.19.3:$PATH
 export PATH=/opt/alex/3.1.3/bin:$PATH
 export PATH=${JAVA_HOME}/bin:$PATH
+export PATH=$PATH:.cabal-sandbox/bin
+export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/code/scala/current/bin
+export PATH=$PATH:$HOME/code/llvm-build/Release+Asserts/bin
 
 export EDITOR=emacs
 
 export PATH="/usr/local/heroku/bin:$PATH"
 export PATH="~/.nodejs/bin:$PATH"
 export PATH="~/code/play/current:$PATH"
-
-export CHEF_USER=groovestomp
-export CHEF_REPO=~/code/unbounce/chef-repo
-source ~/.aws
 
 export QT_SELECT=qt4
