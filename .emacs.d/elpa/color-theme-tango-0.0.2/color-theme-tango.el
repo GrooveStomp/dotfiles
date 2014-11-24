@@ -1,4 +1,39 @@
-;;; Color theme based on Tango Palette. Created by danranx@gmail.com
+;;; color-theme-tango.el --- Tango palette color theme for GNU Emacs.
+
+;; Taken from http://www.emacswiki.org/emacs/color-theme-tango.el
+
+;; Copyright (C) 2010 danranx@gmail.com
+
+;; Author: danranx@gmail.com
+;; Keywords: tango color theme
+;; URL: http://github.com/gorakhargosh/color-themes-collection
+;; Version: 0.0.2
+;; Package-Requires: ((color-theme "6.6.1"))
+
+;; This file is NOT a part of GNU Emacs.
+
+;;; License:
+
+;; This is free software; you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free
+;; Software Foundation; either version 2, or (at your option) any later
+;; version.
+;;
+;; This is distributed in the hope that it will be useful, but WITHOUT
+;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+;; for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+;; MA 02111-1307, USA.
+
+;;; Code:
+
+
+(require 'color-theme)
+
 (defun color-theme-tango ()
   "A color theme based on Tango Palette."
   (interactive)
@@ -43,4 +78,8 @@
      (info-xref-visited ((t (:foreground "#ad7fa8"))))
      )))
 
+(color-theme-tango)
+
 (provide 'color-theme-tango)
+
+;;; color-theme-tango.el ends here

@@ -4,13 +4,12 @@
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
 
 ;; Global vars.
 (defvar *emacs-load-start* (current-time))
-(defvar *home* "/home/aaron/")
-(defvar *emacs-saves* (concat *home* ".emacs-saves/"))
-(defvar *emacs-root* (concat *home* ".emacs.d/"))
 
 ;; General Emacs settings.
 (set-default 'truncate-lines t)
@@ -27,12 +26,12 @@
 (tool-bar-mode -1)
 
 (transient-mark-mode t)
-;(add-hook 'before-save-hook 'delete-trailing-whitespace)
-(remove-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;(remove-hook 'before-save-hook 'delete-trailing-whitespace)
 
 ;; Set file backup scheme.
 (setq backup-by-copying t
-      backup-directory-alist `(("." . ,*emacs-saves*))
+      backup-directory-alist '(("." . "~/.emacs-saves"))
       delete-old-versions t
       kept-new-versions 6
       kept-old-versions 2
@@ -40,17 +39,26 @@
       inferior-lisp-program "/usr/bin/sbcl")
 
 ;; Dependencies.
-(add-to-list 'load-path *emacs-root*)
+(add-to-list 'load-path "~/.emacs.d")
 (require 'paredit)
 (require 'highlight-parentheses)
-;(require 'slime-autoloads)
 (require 'tree-mode)
 (require 'windata)
 (require 'multi-term)
 (require 'tramp)
 (require 'dirtree)
-(setq multi-term-program "/bin/bash")
+(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
+
+;; Color Themes
+;; NOTE(AARON): Only require color themes I'm actually using.
+;; These are just here for whenever I want to try them out and try something different.
+; (require 'color-theme-molokai)
+; (require 'color-theme-monokai)
+; (require 'color-theme-railscasts)
+; (require 'color-theme-solarized)
+(require 'color-theme-tango)
+(color-theme-tango)
 
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
@@ -58,38 +66,14 @@
 ; Set the font face.
 (set-face-attribute 'default t :font "Ubuntu Mono 12")
 
+; Enable auto-complete.
+(ac-exuberant-ctags-setup)
+(setq multi-term-program "/bin/bash")
+(auto-complete-mode)
+
 (defun .add-to-lisp-mode (file-ext)
   (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
 (mapcar '.add-to-lisp-mode '("\\.emacs$" "\\.cl$" "\\.asd$" "\\.el$"))
-
-(defun .set-color-theme ()
-  (color-theme-initialize)
-  (color-theme-tango))
-
-(add-hook 'after-init-hook
-  (lambda ()
-    (.set-color-theme)))
-
-;; (add-hook 'after-init-hook
-;;           (lambda ()
-;;             (.set-color-theme)
-;;             (setq slime-complete-symbol*-fancy t
-;;                   slime-complete-symbol-function 'slime-fuzzy-complete-symbol
-;;                   slime-when-complete-filename-expand t
-;;                   slime-truncate-lines nil
-;;                   slime-autodoc-use-multiline-p t)
-;;             (slime-setup '(slime-fancy slime-asdf))
-;;             (define-key slime-repl-mode-map (kbd "C-c ;") 'slime-insert-balanced-comments)
-;;             (define-key slime-repl-mode-map (kbd "C-c M-;") 'slime-remove-balanced-comments)))
-
-;; (add-hook 'lisp-mode-hook
-;;           (lambda ()
-;;             (enable-paredit-mode)
-;;             (local-set-key (kbd "RET") 'newline-and-indent)
-;;             (highlight-parentheses-mode t)
-;;             (paredit-mode t)
-;;             (setq hl-paren-colors '("red1" "cyan1" "yellow1" "green1" "cyan1" "slateblue1" "magenta1" "purple"))
-;;             (slime-mode t)))
 
 (add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
 (add-hook 'clojure-mode-hook 'paredit-mode)
@@ -99,41 +83,8 @@
 (custom-set-variables '(haskell-tags-on-save t))
 
 ;; Custom functions.
-;; These should go into a new file and be loaded separately.
-
-;; Behave like vi's o command.
-(defun open-next-line (arg)
-  "Move to the next line and then opens a line.
-    See also `newline-and-indent'."
-  (interactive "p")
-  (end-of-line)
-  (open-line arg)
-  (next-line 1)
-  (when newline-and-indent
-    (indent-according-to-mode)))
-
-;; Behave like vi's O command.
-(defun open-previous-line (arg)
-  "Open a new line before the current one.
-     See also `newline-and-indent'."
-  (interactive "p")
-  (beginning-of-line)
-  (open-line arg)
-  (when newline-and-indent
-    (indent-according-to-mode)))
-
-;; Delete all whitespace from point to next word.
-(defun delete-horizontal-space-forward ()
-  "*Delete all spaces and tabs after point."
-  (interactive "*")
-  (delete-region (point) (progn (skip-chars-forward " \t") (point))))
-
-(global-set-key (kbd "C-o") 'open-next-line)
-(global-set-key (kbd "M-o") 'open-previous-line)
-(global-set-key (kbd "RET") 'newline-and-indent)
-(global-set-key "\C-x\C-o" 'dirtree-show)
-(global-set-key "\C-x\C-l" 'goto-line)
-(global-set-key (kbd "M-\\") 'delete-horizontal-space-forward)
+(load-library "support.el")
+; (load-library "lisp-config.el")
 
 (windmove-default-keybindings)
 
@@ -151,6 +102,24 @@
  '(term-color-blue ((t (:background "light sky blue" :foreground "light sky blue"))))
  '(term-color-green ((t (:background "chartreuse2" :foreground "chartreuse2"))))
  '(term-color-magenta ((t (:background "plum3" :foreground "plum3")))))
+
+;; ;; Org-Mode
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
+(add-hook 'org-mode-hook 'turn-on-font-lock) ; Not needed when global-font-lock-mode is on?
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+(global-set-key (kbd "C-o")     'open-next-line)
+(global-set-key (kbd "M-o")     'open-previous-line)
+(global-set-key (kbd "RET")     'newline-and-indent)
+(global-set-key (kbd "C-x C-o") 'dirtree-show)
+(global-set-key (kbd "M-\\")    'delete-horizontal-space-forward)
+(global-set-key (kbd "C-c C-w") 'copy-word)
+(global-set-key (kbd "C-c C-l") 'copy-line)
+(global-set-key (kbd "C-c C-p") 'copy-paragraph)
+(global-set-key (kbd "M-n")     'forward-paragraph)
+(global-set-key (kbd "M-p")     'backward-paragraph)
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))

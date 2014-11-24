@@ -7,3 +7,4 @@
 .tmux/*
 *.swp
 *.~1~
+.emacs.d/elpa/archives/*
