@@ -1,13 +1,13 @@
-. ${HOME}/.profile
 . ${HOME}/.bash.d/ubuntu_defaults.sh
 . ${HOME}/.bash.d/git-prompt.sh
 . ${HOME}/.bash.d/aliases.sh
 . ${HOME}/.bash.d/completion.sh
-. ${HOME}/.bash.d/colorscheme.sh
-. ${HOME}/.bash.d/completions/colorscheme.sh
+#. ${HOME}/.bash.d/colorscheme.sh
+#. ${HOME}/.bash.d/completions/colorscheme.sh
 . ${HOME}/.bash.d/touchpad.sh
 . ${HOME}/.bash.d/completions/touchpad.sh
 . ${HOME}/.bash.d/chruby.sh
+. ${HOME}/.bash.d/fs.sh
 
 # JRuby stuff.
 export JAVA_OPTS='-Djruby.compile.mode=OFF -XX:+TieredCompilation -XX:TieredStopAtLevel=1'
@@ -90,6 +90,3 @@ function compose_prompt() {
 }
 
 PROMPT_COMMAND=compose_prompt
-
-# added by travis gem
-[ -f /home/aoman/.travis/travis.sh ] && source /home/aoman/.travis/travis.sh
