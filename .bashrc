@@ -2,8 +2,8 @@
 . ${HOME}/.bash.d/git-prompt.sh
 . ${HOME}/.bash.d/aliases.sh
 . ${HOME}/.bash.d/completion.sh
-#. ${HOME}/.bash.d/colorscheme.sh
-#. ${HOME}/.bash.d/completions/colorscheme.sh
+. ${HOME}/.bash.d/colorscheme.sh
+. ${HOME}/.bash.d/completions/colorscheme.sh
 . ${HOME}/.bash.d/touchpad.sh
 . ${HOME}/.bash.d/completions/touchpad.sh
 . ${HOME}/.bash.d/chruby.sh
