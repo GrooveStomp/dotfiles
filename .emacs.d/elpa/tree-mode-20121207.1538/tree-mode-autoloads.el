@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads (tree-minor-mode) "tree-mode" "tree-mode.el" (21287
-;;;;;;  11338 307190 847000))
+;;;### (autoloads (tree-minor-mode) "tree-mode" "tree-mode.el" (21565
+;;;;;;  35318 70697 335000))
 ;;; Generated autoloads from tree-mode.el
 
 (autoload 'tree-minor-mode "tree-mode" "\
@@ -16,8 +16,8 @@ More keybindings for tree-widget.
 
 ;;;***
 
-;;;### (autoloads nil nil ("tree-mode-pkg.el") (21287 11338 331939
-;;;;;;  196000))
+;;;### (autoloads nil nil ("tree-mode-pkg.el") (21565 35318 105317
+;;;;;;  704000))
 
 ;;;***
 

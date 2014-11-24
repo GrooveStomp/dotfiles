@@ -3,8 +3,8 @@
 ;;; Code:
 
 
-;;;### (autoloads nil nil ("dirtree-pkg.el" "dirtree.el") (21287
-;;;;;;  11338 546349 366000))
+;;;### (autoloads nil nil ("dirtree-pkg.el" "dirtree.el") (21565
+;;;;;;  35361 811742 461000))
 
 ;;;***
 
