@@ -1,12 +1,14 @@
 (require 'cl)
 
 ;; ELPA Package manager setup.
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
 ;; Global vars.
 (defvar *emacs-load-start* (current-time))
-(defvar *home* "/home/aoman/")
+(defvar *home* "/home/aaron/")
 (defvar *emacs-saves* (concat *home* ".emacs-saves/"))
 (defvar *emacs-root* (concat *home* ".emacs.d/"))
 
@@ -65,27 +67,36 @@
   (color-theme-tango))
 
 (add-hook 'after-init-hook
-          (lambda ()
-            (.set-color-theme)
-            (setq slime-complete-symbol*-fancy t
-                  slime-complete-symbol-function 'slime-fuzzy-complete-symbol
-                  slime-when-complete-filename-expand t
-                  slime-truncate-lines nil
-                  slime-autodoc-use-multiline-p t)
-            (slime-setup '(slime-fancy slime-asdf))
-            (define-key slime-repl-mode-map (kbd "C-c ;") 'slime-insert-balanced-comments)
-            (define-key slime-repl-mode-map (kbd "C-c M-;") 'slime-remove-balanced-comments)))
+  (lambda ()
+    (.set-color-theme)))
 
-(add-hook 'lisp-mode-hook
-          (lambda ()
-            (enable-paredit-mode)
-            (local-set-key (kbd "RET") 'newline-and-indent)
-            (highlight-parentheses-mode t)
-            (paredit-mode t)
-            (setq hl-paren-colors '("red1" "cyan1" "yellow1" "green1" "cyan1" "slateblue1" "magenta1" "purple"))
-            (slime-mode t)))
+;; (add-hook 'after-init-hook
+;;           (lambda ()
+;;             (.set-color-theme)
+;;             (setq slime-complete-symbol*-fancy t
+;;                   slime-complete-symbol-function 'slime-fuzzy-complete-symbol
+;;                   slime-when-complete-filename-expand t
+;;                   slime-truncate-lines nil
+;;                   slime-autodoc-use-multiline-p t)
+;;             (slime-setup '(slime-fancy slime-asdf))
+;;             (define-key slime-repl-mode-map (kbd "C-c ;") 'slime-insert-balanced-comments)
+;;             (define-key slime-repl-mode-map (kbd "C-c M-;") 'slime-remove-balanced-comments)))
 
+;; (add-hook 'lisp-mode-hook
+;;           (lambda ()
+;;             (enable-paredit-mode)
+;;             (local-set-key (kbd "RET") 'newline-and-indent)
+;;             (highlight-parentheses-mode t)
+;;             (paredit-mode t)
+;;             (setq hl-paren-colors '("red1" "cyan1" "yellow1" "green1" "cyan1" "slateblue1" "magenta1" "purple"))
+;;             (slime-mode t)))
 
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
+(add-hook 'clojure-mode-hook 'paredit-mode)
+
+(setenv "PATH" (concat "~/.cabal/bin:" (getenv "PATH")))
+(add-to-list 'exec-path "~/.cabal/bin")
+(custom-set-variables '(haskell-tags-on-save t))
 
 ;; Custom functions.
 ;; These should go into a new file and be loaded separately.
