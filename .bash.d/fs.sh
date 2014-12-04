@@ -65,10 +65,10 @@ fs-grep() {
 
     case $flavor in
         "ruby")
-            grep -r "$search_term" * | grep -v "\#\w+\#:" | grep -v "\.json" | grep -v "\.js" | grep -v "\.log" | grep -v devops/ | grep -v tmp/ | grep -v coverage/ | grep -v "\.slim" | grep -v "\.csv"
+            grep -rn "$search_term" * | grep -v "\#\w+\#:" | grep -v "\.json" | grep -v "\.js" | grep -v "\.log" | grep -v devops/ | grep -v tmp/ | grep -v coverage/ | grep -v "\.slim" | grep -v "\.csv" | grep -v "TAGS" | grep -v "\.html"
             ;;
         "with-templates")
-            grep -r "$search_term" * | grep -v "\#\w+\#:" | grep -v "\.json" | grep -v "\.js" | grep -v "\.log" | grep -v devops/ | grep -v tmp/ | grep -v coverage/ | grep -v "\.csv"
+            grep -rn "$search_term" * | grep -v "\#\w+\#:" | grep -v "\.json" | grep -v "\.js" | grep -v "\.log" | grep -v devops/ | grep -v tmp/ | grep -v coverage/ | grep -v "\.csv" | grep -v "TAGS"
             ;;
     esac
 }
