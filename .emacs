@@ -64,7 +64,8 @@
 (setq tramp-default-method "sshx")
 
 ; Set the font face.
-(set-face-attribute 'default t :font "Ubuntu Mono 12")
+;(set-face-attribute 'default t :font "Ubuntu Mono 12")
+(set-face-attribute 'default t :font "Liberation Mono 10")
 
 ; Enable auto-complete.
 (ac-exuberant-ctags-setup)
