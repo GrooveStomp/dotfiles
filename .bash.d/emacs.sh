@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ruby-ctags() {
-    ctags --verbose -f TAGS -R --fields="+afikKlmnsSzt"
+    ctags --verbose -e -R --fields="+afikKlmnsSzt"
 }
 
 # This is a version I thought was good...

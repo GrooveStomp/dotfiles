@@ -1,3 +1,11 @@
+;; dirty fix for having AC everywhere
+(define-globalized-minor-mode real-global-auto-complete-mode
+    auto-complete-mode (lambda ()
+                         (if (not (minibufferp (current-buffer)))
+                             (auto-complete-mode 1))
+                         ))
+(real-global-auto-complete-mode t)
+
 (defun get-point (symbol &optional arg)
   "get the point"
   (funcall symbol arg)
@@ -14,7 +22,7 @@
 
 (defun paste-to-mark(&optional arg)
   "Paste things to mark, or to the prompt in shell-mode"
-  (let ((pasteMe 
+  (let ((pasteMe
          (lambda()
            (if (string= "shell-mode" major-mode)
                (progn (comint-next-prompt 25535) (yank))

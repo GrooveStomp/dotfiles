@@ -8,3 +8,4 @@
 *.swp
 *.~1~
 .emacs.d/elpa/archives/*
+.emacs.d/ac-comphist.dat
