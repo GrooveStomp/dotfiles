@@ -1,13 +1,15 @@
-. ${HOME}/.bash.d/ubuntu_defaults.sh
-. ${HOME}/.bash.d/git-prompt.sh
-. ${HOME}/.bash.d/aliases.sh
-. ${HOME}/.bash.d/completion.sh
-. ${HOME}/.bash.d/colorscheme.sh
-. ${HOME}/.bash.d/completions/colorscheme.sh
-. ${HOME}/.bash.d/touchpad.sh
-. ${HOME}/.bash.d/completions/touchpad.sh
-. ${HOME}/.bash.d/chruby.sh
-. ${HOME}/.bash.d/fs.sh
+. $HOME/.bash.d/ubuntu_defaults.sh
+. $HOME/.bash.d/git-prompt.sh
+. $HOME/.bash.d/aliases.sh
+. $HOME/.bash.d/completion.sh
+#. $HOME/.bash.d/colorscheme.sh
+#. $HOME/.bash.d/completions/colorscheme.sh
+. $HOME/.bash.d/touchpad.sh
+. $HOME/.bash.d/completions/touchpad.sh
+. $HOME/.bash.d/chruby.sh
+. $HOME/.bash.d/fs.sh
+. $HOME/.bash.d/emacs.sh
+. $HOME/.bash.d/misc.sh
 
 # JRuby stuff.
 export JAVA_OPTS='-Djruby.compile.mode=OFF -XX:+TieredCompilation -XX:TieredStopAtLevel=1'
@@ -15,11 +17,11 @@ export JRUBY_OPTS='-Xcompile.invokedynamic=false'
 
 term_bg_file=${HOME}/.backup/.termbg
 
-if [ $(cat ${term_bg_file}) == "light" ]; then
-  colorscheme solarized-light
-else
-  colorscheme solarized-dark
-fi
+#if [ $(cat ${term_bg_file}) == "light" ]; then
+#  colorscheme solarized-light
+#else
+#  colorscheme solarized-dark
+#fi
 
 function rename-terminal() {
   echo -n -e "\033]0;$1\007"
