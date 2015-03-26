@@ -36,6 +36,8 @@
       kept-new-versions 6
       kept-old-versions 2
       version-control t
+      ;; Make normal search work like dired-isearch-filenames when in dired.
+      dired-isearch-filenames t
       inferior-lisp-program "/usr/bin/sbcl")
 
 ;; Dependencies.
