@@ -2,10 +2,8 @@
 !.vim/bundle/README
 .ghc/*
 !.ghc/ghci.conf
-.emacs.d/auto-save-list/*
-.emacs.d/session.*
 .tmux/*
 *.swp
 *.~1~
-.emacs.d/elpa/archives/*
-.emacs.d/ac-comphist.dat
+.emacs.d
+!.emacs.d/support.el
