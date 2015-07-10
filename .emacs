@@ -59,15 +59,17 @@
 ; (require 'color-theme-monokai)
 ; (require 'color-theme-railscasts)
 ; (require 'color-theme-solarized)
-(require 'color-theme-tango)
-(color-theme-tango)
+; (require 'color-theme-tango)
+; (color-theme-tango)
+(load-theme 'railscasts t nil)
 
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
 
 ; Set the font face.
 ;(set-face-attribute 'default t :font "Ubuntu Mono 12")
-(set-face-attribute 'default t :font "Liberation Mono 10")
+;(set-face-attribute 'default t :font "Ubuntu Mono 12");Liberation Mono 10")
+(set-frame-font "-unknown-Liberation Mono-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
 
 ; Enable auto-complete.
 (ac-exuberant-ctags-setup)
