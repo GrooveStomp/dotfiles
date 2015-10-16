@@ -8,8 +8,15 @@ function list-functions() {
     echo "rmq-publish"
     echo "soa-refresh-mysql-db"
     echo "soa-auth-token"
+    echo "soa-member-id"
     echo "soa-signup"
+    echo "soa-get-credit-app-id"
     echo "soa-run"
+    echo "soa-create-liquid-loan"
+    echo "soa-upload-document"
+    echo "soa-verify-pay_stub"
+    echo "soa-verify-photo_id"
+    echo "soa-verify-bank_statement"
     echo "docker-gc"
     echo "git-clean-branches"
 }
@@ -87,6 +94,19 @@ function soa-refresh-mysql-db() {
 }
 
 function soa-auth-token() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
 
@@ -96,11 +116,24 @@ function soa-auth-token() {
         return
     fi
 
-    local auth_token=`catapult exec login auto $username $password | grep auth_token | awk '{print $2}'`
+    local auth_token=$(HOST=$HOST PORT=$PORT catapult exec login auto $username $password | grep auth_token | awk '{print $2}')
     echo ${auth_token:1:-2}
 }
 
 function soa-member-id() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
 
@@ -110,11 +143,24 @@ function soa-member-id() {
         return
     fi
 
-    local id=`catapult exec login auto $username $password | grep member_id | awk '{print $2}'`
+    local id=$(HOST=$HOST PORT=$PORT catapult exec login auto $username $password | grep member_id | awk '{print $2}')
     echo ${id%?} # Strip the trailing comma.
 }
 
 function soa-signup() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
 
@@ -127,7 +173,8 @@ function soa-signup() {
     local log="${FUNCNAME[0]}.log"
 
     catapult exec signup default $username $password > $log
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
+
     local confirmation_token=$(cat $log | grep confirmation_token | awk '{print $2}')
     confirmation_token=$(echo ${confirmation_token:1:-2})
     rm -f $log
@@ -144,52 +191,21 @@ function soa-signup() {
 }
 
 function soa-get-credit-app-id() {
-    local username=$1
-    local password=$2
-
-    if [[ -z "$username" ]] || [[ -z "$password" ]]; then
-        echo "Usage: ${FUNCNAME[0]} username password"
-        echo "  eg.: ${FUNCNAME[0]} aarono@mogo.ca password1"
-        return
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
     fi
-
-    local credit_app_id=$(catapult exec index_credit_applications auto $(soa-auth-token $username $password) | grep '^       "id"' | awk '{print $2}')
-    echo ${credit_app_id%?} # Strip the trailing comma.
-}
-
-function soa-create-liquid-loan() {
-    local username=$1
-    local password=$2
-
-    local log="${FUNCNAME[0]}.log"
-
-    if [[ -z "$username" ]] || [[ -z "$password" ]]; then
-        echo "Usage: ${FUNCNAME[0]} username password"
-        echo "  eg.: ${FUNCNAME[0]} aarono@mogo.ca password1"
-        return
-    fi
-
-    local credit_app_id=$(soa-get-credit-app-id $username $password)
-    if [[ -z "$credit_app_id" ]]; then
-        echo "Couldn't find credit application ID"
-        return
-    fi
-
-    catapult exec create_liquid_loan default $(soa-auth-token $username $password) $credit_app_id > $log
-    rm -f $log
-}
-
-function soa-run() {
     if [[ -z "$HOST" ]]; then
         HOST=localhost
     fi
     if [[ -z "$PORT" ]]; then
         PORT=443
     fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
 
     local username=$1
     local password=$2
-    local tmp
 
     if [[ -z "$username" ]] || [[ -z "$password" ]]; then
         echo "Usage: ${FUNCNAME[0]} username password"
@@ -197,15 +213,79 @@ function soa-run() {
         return
     fi
 
-    soa-signup $username $password
+    local credit_app_id=$(HOST=$HOST PORT=$PORT catapult exec index_credit_applications auto $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) | grep '^       "id"' | awk '{print $2}')
+    echo ${credit_app_id%?} # Strip the trailing comma.
+}
+
+function soa-create-liquid-loan() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
+    local username=$1
+    local password=$2
 
     local log="${FUNCNAME[0]}.log"
-    catapult exec create_credit_application default $(soa-auth-token $username $password) > $log
+
+    if [[ -z "$username" ]] || [[ -z "$password" ]]; then
+        echo "Usage: ${FUNCNAME[0]} username password"
+        echo "  eg.: ${FUNCNAME[0]} aarono@mogo.ca password1"
+        return
+    fi
+
+    local credit_app_id=$(HOST=$HOST PORT=$PORT soa-get-credit-app-id $username $password $verbosity)
+    if [[ -z "$credit_app_id" ]]; then
+        echo "Couldn't find credit application ID"
+        return
+    fi
+
+    catapult exec create_liquid_loan default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
+    [ "-v" == "$verbosity" ] && cat $log
+    rm -f $log
+}
+
+function soa-run() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
+    local username=$1
+    local password=$2
+    local tmp
+    local log="${FUNCNAME[0]}.log"
+
+    if [[ -z "$username" ]] || [[ -z "$password" ]]; then
+        echo "Usage: ${FUNCNAME[0]} username password"
+        echo "  eg.: ${FUNCNAME[0]} aarono@mogo.ca password1"
+        return
+    fi
+
+    soa-signup $username $password $verbosity
+
+    catapult exec create_credit_application default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) > $log
     local credit_app_id=$(cat $log | grep '^   "id"' | awk '{print $2}')
     credit_app_id=$(echo ${credit_app_id%?}) # Strip the trailing comma.
 
     if [[ -z "$credit_app_id" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
         rm -f log
         echo "Credit Application ID not found"
         return
@@ -213,48 +293,53 @@ function soa-run() {
 
     echo "Credit Application ID: $credit_app_id"
 
-    catapult exec edit_credit_application default $(soa-auth-token $username $password) $credit_app_id 000065535 > $log
+    catapult exec edit_credit_application default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id 000065535 > $log
     if [[ $(cat $log) =~ "\"errors\":" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
+        rm -f $log
         echo "Encountered an error editing credit application"
         return
     fi
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
-    catapult exec create_liquid_loan default $(soa-auth-token $username $password) $credit_app_id > $log
+    catapult exec create_liquid_loan default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
     if [[ $(cat $log) =~ "\"errors\":" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
+        rm -f $log
         echo "Encountered an error creating liquid loan"
         return
     fi
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
-    catapult exec create_funding_info default $(soa-auth-token $username $password) $credit_app_id > $log
+    catapult exec create_funding_info default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
     if [[ $(cat $log) =~ "\"errors\":" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
+        rm -f $log
         echo "Encountered an creating funding info"
         return
     fi
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
-    catapult exec create_employment_info default $(soa-auth-token $username $password) $credit_app_id > $log
+    catapult exec create_employment_info default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
     if [[ $(cat $log) =~ "\"errors\":" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
+        rm -f $log
         echo "Encountered an creating employment info"
         return
     fi
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
-    catapult exec create_contact_number default $(soa-auth-token $username $password) $credit_app_id > $log
+    catapult exec create_contact_number default $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
     if [[ $(cat $log) =~ "\"errors\":" ]]; then
-        cat $log
+        [ "-v" == "$verbosity" ] && cat $log
+        rm -f $log
         echo "Encountered an creating contact number"
         return
     fi
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
-    catapult exec create_verification_contact_number auto $(soa-auth-token $username $password) sms $credit_app_id > $log
-#    cat $log
+    catapult exec create_verification_contact_number auto $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) sms $credit_app_id > $log
+    [ "-v" == "$verbosity" ] && cat $log
     local verification_pin=$(cat $log | grep verification_pin | awk '{print $2}')
     verification_pin=$(echo ${verification_pin:1:-2})
     rm -f $log
@@ -266,8 +351,8 @@ function soa-run() {
 
     echo "Verification PIN: $verification_pin"
 
-    catapult exec edit_verification_contact_number auto $(soa-auth-token $username $password) $credit_app_id $verification_pin > $log
-    #    cat $log
+    catapult exec edit_verification_contact_number auto $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id $verification_pin > $log
+    [ "-v" == "$verbosity" ] && cat $log
 
     local pay_stub_id
     local photo_id_id
@@ -277,7 +362,7 @@ function soa-run() {
     declare -a local file_uploads=('pay_stub' 'photo_id' 'bank_statement')
 
     for doc_type in "${file_uploads[@]}"; do
-        local doc_id=$(soa-upload-document $username $password $doc_type | tail -n 1)
+        local doc_id=$(HOST=$HOST PORT=$PORT soa-upload-document $username $password $doc_type $verbosity | tail -n 1)
         tmp="${doc_type}_id"
         eval "$tmp=$doc_id"
 
@@ -287,26 +372,33 @@ function soa-run() {
         fi
     done
 
-    catapult exec checkout auto $(soa-auth-token $username $password) $credit_app_id > $log
-    #    cat $log
+    catapult exec checkout auto $(HOST=$HOST PORT=$PORT soa-auth-token $username $password $verbosity) $credit_app_id > $log
+    [ "-v" == "$verbosity" ] && cat $log
 
     #-- Verify uploaded documents ----------------------------------------------------------------------------
     for doc_type in "${file_uploads[@]}"; do
         tmp="${doc_type}_id"
         local current_id=$(echo ${!tmp})
         local current_fn="soa-verify-${doc_type}"
-        $($current_fn $username $password $current_id)
+        $(HOST=$HOST PORT=$PORT $current_fn $username $password $current_id $verbosity)
     done
+
+    rm -f $log
 }
 
 function soa-upload-document() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
     if [[ -z "$HOST" ]]; then
         HOST=localhost
     fi
-
     if [[ -z "$PORT" ]]; then
         PORT=443
     fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
 
     local username=$1
     local password=$2
@@ -326,7 +418,7 @@ function soa-upload-document() {
     cp $full_name $upload_doc
     upload_doc="$(pwd)/$upload_doc"
 
-    local credit_app_id=$(soa-get-credit-app-id $username $password)
+    local credit_app_id=$(HOST=$HOST PORT=$PORT soa-get-credit-app-id $username $password $verbosity)
 
     curl --insecure -s -X POST \
         -H "X-Auth-Token: $(soa-auth-token $username $password)" \
@@ -334,11 +426,12 @@ function soa-upload-document() {
         -H "Content-Type: multipart/form-data" \
         -F "upload=@$upload_doc" \
         https://$HOST:$PORT/credit_applications/$credit_app_id/additional_doc/$doc_type > $log
-#    cat $log
+    [ "-v" == "$verbosity" ] && cat $log
 
     if [[ ! ($(cat $log) =~ "polling_url") ]]; then
         echo "Something bad happened when uploading pay_stub"
         rm -f $upload_doc
+        rm -f $log
         return
     fi
 
@@ -354,26 +447,40 @@ function soa-upload-document() {
             https://$HOST:$PORT$polling_url > $log
 
         if [[ $(cat $log) =~ "polling_url" ]]; then
-#            cat $log
+            [ "-v" == "$verbosity" ] && cat $log
             sleep 1
         else
             catapult exec get_additional_doc auto $(soa-auth-token $username $password) $credit_app_id $doc_type > $log
-#            cat $log
+            [ "-v" == "$verbosity" ] && cat $log
             local doc_id=$(cat $log | grep '^   "id"' | awk '{print $2}')
             echo ${doc_id%?} # Strip the trailing comma.
+            rm -f $log
             break
         fi
     done
 
     rm -f $upload_doc
+    rm -f $log
 }
 
 function soa-verify-pay_stub() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
     local doc_id=$3
-
-    echo "${FUNCNAME[0]} $username $password $doc_id"
+    local log="${FUNCNAME[0]}.log"
 
     if [[ -z "$username" ]] || [[ -z "$password" ]] || [[ -z $doc_id ]]; then
         echo "Usage: ${FUNCNAME[0]} username password uploaded_document_id"
@@ -391,15 +498,29 @@ function soa-verify-pay_stub() {
               { \"question_id\": 1, \"answer\": true },
               { \"question_id\": 2, \"answer\": true }
             ]
-        }"
+        }" > $log
+    [ "-v" == "$verbosity" ] && cat $log
+    rm -f $log
 }
 
 function soa-verify-photo_id() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
     local doc_id=$3
-
-    echo "${FUNCNAME[0]} $username $password $doc_id"
+    local log="${FUNCNAME[0]}.log"
 
     if [[ -z "$username" ]] || [[ -z "$password" ]] || [[ -z $doc_id ]]; then
         echo "Usage: ${FUNCNAME[0]} username password uploaded_document_id"
@@ -419,13 +540,29 @@ function soa-verify-photo_id() {
               { \"question_id\": 5, \"answer\": true },
               { \"question_id\": 6, \"answer\": true }
             ]
-        }"
+        }" > $log
+    [ "-v" == "$verbosity" ] && cat $log
+    rm -f $log
 }
 
 function soa-verify-bank_statement() {
+    local last_arg="${!#}"
+    local verbosity=0
+    if [[ "-v" == "$last_arg" ]] || [[ "--verbose" == "$last_arg" ]]; then
+        verbosity="-v"
+    fi
+    if [[ -z "$HOST" ]]; then
+        HOST=localhost
+    fi
+    if [[ -z "$PORT" ]]; then
+        PORT=443
+    fi
+    echo "${FUNCNAME[0]}, HOST=$HOST, PORT=$PORT, verbosity=$verbosity"
+
     local username=$1
     local password=$2
     local doc_id=$3
+    local log="${FUNCNAME[0]}.log"
 
     echo "${FUNCNAME[0]} $username $password $doc_id"
 
@@ -447,7 +584,9 @@ function soa-verify-bank_statement() {
               { \"question_id\": 12, \"answer\": true },
               { \"question_id\": 13, \"answer\": true }
             ]
-        }"
+        }" > $log
+    [ "-v" == "$verbosity" ] && cat $log
+    rm -f $log
 }
 
 function docker-gc() {
