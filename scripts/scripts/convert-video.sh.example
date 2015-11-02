@@ -1,0 +1,1 @@
+ffmpeg -i Mr.Robot.S01E02.720p.HDTV.x264-KILLERS.mkv -vf subtitles=subtitles/Mr\ Robot\ S01E02\ x264.srt -q:a 0 -q:v 0 -acodec ac3 -strict experimental output.mp4
