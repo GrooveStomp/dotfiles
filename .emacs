@@ -43,13 +43,13 @@
 ;; Dependencies.
 (add-to-list 'load-path "~/.emacs.d")
 (require 'paredit)
-(require 'highlight-parentheses)
+;(require 'highlight-parentheses)
 (require 'tree-mode)
 (require 'windata)
 (require 'multi-term)
 (require 'tramp)
 (require 'dirtree)
-(require 'auto-complete-exuberant-ctags)
+;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
 ;; Color Themes
@@ -66,15 +66,10 @@
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
 
-; Set the font face.
-;(set-face-attribute 'default t :font "Ubuntu Mono 12")
-;(set-face-attribute 'default t :font "Ubuntu Mono 12");Liberation Mono 10")
-(set-frame-font "-unknown-Liberation Mono-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-
 ; Enable auto-complete.
-(ac-exuberant-ctags-setup)
+;(ac-exuberant-ctags-setup)
 (setq multi-term-program "/bin/bash")
-(auto-complete-mode)
+;(auto-complete-mode)
 
 (defun .add-to-lisp-mode (file-ext)
   (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
@@ -145,6 +140,12 @@
 (global-set-key (kbd "C-c C-p") 'copy-paragraph)
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
+
+; Set the font face.
+;(set-face-attribute 'default t :font "Ubuntu Mono 10")
+;(set-face-attribute 'default t :font "Ubuntu Mono 12");Liberation Mono 10")
+;(set-face-attribute 'default nil :height 100)
+(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11")
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))

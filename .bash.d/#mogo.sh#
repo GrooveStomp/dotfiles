@@ -1,0 +1,64 @@
+function mogo-soa-test() {
+    local email=$1
+    local password=$2
+    local ce='catapult exec'
+
+    ce signup default $email $password 
+    ce activate auto # TODO
+
+    ca create_credit_application default $(catapult-auth-token)
+    ca edit_credit_application default $(catapult-auth-token) ff 000065535
+---
+ce signup default duthied@gmail.com 1q2w3e4r5t
+ce activate auto 36120939-4c26-4baf-9757-b57fbe96fd80
+---
+ce create_credit_application default `auth_me`
+ce edit_credit_application default `auth_me` 1 000065535
+ce create_liquid_loan default `auth_me` 1
+ce create_funding_info default `auth_me` 1
+ce create_employment_info default `auth_me` 1
+ce create_contact_number default `auth_me` 1
+ce create_verification_contact_number auto `auth_me` sms 1
+ce edit_verification_contact_number auto `auth_me` 1 09358
+--
+(run auth_me function to get with token for curl commands)
+curl --insecure -XPOST -H "X-Auth-Token: 2cde44c5-d517-4ae5-be35-8fa20e5e8bb9" -H "Accept: application/vnd.mogo.v2" -H "Content-Type: multipart/form-data" -F "upload=@/Users/devlon.duthie/Dropbox/awesome/Cats-random-funny-4.jpg" https://dockervm:443/credit_applications/1/additional_doc/pay_stub
+
+curl --insecure -XPOST -H "X-Auth-Token: 2cde44c5-d517-4ae5-be35-8fa20e5e8bb9" -H "Accept: application/vnd.mogo.v2" -H "Content-Type: multipart/form-data" -F "upload=@/Users/devlon.duthie/Dropbox/awesome/Cats-random-funny-4.jpg" https://dockervm:443/credit_applications/1/additional_doc/photo_id
+
+curl --insecure -XPOST -H "X-Auth-Token: 2cde44c5-d517-4ae5-be35-8fa20e5e8bb9" -H "Accept: application/vnd.mogo.v2" -H "Content-Type: multipart/form-data" -F "upload=@/Users/devlon.duthie/Dropbox/awesome/Cats-random-funny-4.jpg" https://dockervm:443/credit_applications/1/additional_doc/bank_statement
+
+---------------------------
+ - requirements completed at this point -
+---------------------------
+
+ce checkout auto `auth_me` 1
+
+---------------------------
+- verify additional documents -
+---------------------------
+(using RMQ response from checkout, type: ready_to_review - can be found via logger_service output)
+
+ra routing_key=verification.perform \
+  properties='{"type": "edit_additional_document", "correlation_id": "65535", "headers": { "member_id": 1 } }' \
+  payload='{"credit_application_id":1, "additional_document_id":1, "verified_by":"devlon", "document_verification_questions":[{"question_id":1, "answer":true }, {"question_id":2, "answer":true }, {"question_id":3, "answer":true }, {"question_id":4, "answer":true } ] }'
+
+ra routing_key=credit_application.perform \
+  properties='{"type": "validate_completeness", "correlation_id": "65535", "headers": { "member_id": 1 } }' \
+  payload='{ "id":1 }'
+
+ra routing_key=liquid.perform \
+  properties='{"type": "funded", "correlation_id": "65535", "headers": { "member_id": 1 } }' \
+  payload='{ "id": 1 }'
+
+---------------------------
+- create agreements - 
+---------------------------
+
+ra routing_key=agreement.perform \
+  properties='{"type": "create", "correlation_id": "65535", "headers": { "member_id": 1, "version": 1 } }' \
+  payload='{ "loan_id": 1, "loan_type": "liquid" }'
+
+---------------------------
+- get and sign agreements -
+---------------------------
