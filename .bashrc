@@ -71,7 +71,7 @@ function compose_prompt() {
 
   local machine="${purple}\u@\h"
   local path="${green}\w"
-  local ruby="${red}rb:$(ruby -v | awk '{print $2}')"
+  local ruby="${red}$(ruby -v | awk '{print $1, $2}')"
   local git=$(git_string)
 
   PS1="${open}${machine}${separator}${path}${git}${ruby}${close}\n↳ "
