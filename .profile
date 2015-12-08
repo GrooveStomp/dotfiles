@@ -24,7 +24,7 @@ fi
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export TERM=xterm-256color
 
-export PATH=$PATH:${HOME}/script:${HOME}/bin
+export PATH=$PATH:${HOME}/scripts:${HOME}/bin
 export PATH=$PATH:$HOME/code/llvm-build/Release+Asserts/bin
 
 export EDITOR=emacs
@@ -32,4 +32,3 @@ export EDITOR=emacs
 export QT_SELECT=qt4
 
 export GOPATH=~/code/go
-export HTTPSERVICEPATH=$GOPATH/src/github.com/mogofinancial/http_service
