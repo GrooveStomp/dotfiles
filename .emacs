@@ -80,7 +80,14 @@
 
 (setenv "PATH" (concat "~/.cabal/bin:" (getenv "PATH")))
 (add-to-list 'exec-path "~/.cabal/bin")
-(custom-set-variables '(haskell-tags-on-save t))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"])
+ '(haskell-tags-on-save t)
+ '(vc-follow-symlinks t))
 
 ;; Custom functions.
 (load-library "support.el")
@@ -88,12 +95,7 @@
 
 (windmove-default-keybindings)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"]))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -141,11 +143,13 @@
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
 
-; Set the font face.
-;(set-face-attribute 'default t :font "Ubuntu Mono 10")
-;(set-face-attribute 'default t :font "Ubuntu Mono 12");Liberation Mono 10")
-;(set-face-attribute 'default nil :height 100)
-(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11")
+
+;(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11") ; 14
+;; 4K: 14, 1440P: 12
+(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
+;(set-face-attribute 'default nil :font "Liberation Mono 11") ; 14
+;(set-face-attribute 'default nil :font "Source Sans Pro 13")
+
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
@@ -155,3 +159,4 @@
                  (second *finish-time*))
               (+ (first *emacs-load-start*)
                  (second *emacs-load-start*)))))
+(put 'narrow-to-region 'disabled nil)
