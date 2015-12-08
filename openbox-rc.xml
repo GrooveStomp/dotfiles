@@ -300,50 +300,61 @@
     <keybind key="W-S-Down">
       <action name="DirectionalCycleWindows"/>
     </keybind>
-    <keybind key="W-h">
+    <!-- Keybindings for window tiling -->
+    <!--
+      4K Monitor:    3840 x 2160 | Bottom Panel Height: 50px (2.3148%)
+        Height: 2160             | -Bottom Panel: 2110
+        Half Height: 1080        | -Bottom Panel: 1030
+        Half Width: 1920
+
+      1440P Monitor: 2560 x 1440 | Bottom Panel Height: 33px (2.3148%)
+        Height: 1440             | -Bottom Panel: 1407
+        Half Height: 720         | -Bottom Panel: 687
+        Half Width: 1280
+
+      1080p Monitor: 1920 x 1080 | Bottom Panel Height: 25px (2.3148%)
+        Height: 1080             | -Bottom Panel: 1055
+        Half Height: 540         | -Bottom Panel: 515
+        Half Width: 960
+    -->
+    <keybind key="W-h">        # HalfLeftScreen
       <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>0</x>
-        <y>0</y>
-        <width>50%</width>
-        <height>97%</height>
-      </action>
+      <!-- 4K Monitor -->
+      <action name="MoveResizeTo"><x>0</x><y>0</y><height>2110</height><width>1920</width></action>
+      <!-- 1440p Monitor -->
+      <!-- <action name="MoveResizeTo"><x>0</x><y>0</y><height>1407</height><width>1280</width></action> -->
+      <!-- 1080p Monitor -->
+      <!--<action name="MoveResizeTo"><x>0</x><y>0</y><height>1055</height><width>960</width></action>-->
     </keybind>
-    <keybind key="W-l">
+    <keybind key="W-l">        # HalfRightScreen
       <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>-0</x>
-        <y>0</y>
-        <width>50%</width>
-        <height>97%</height>
-      </action>
+      <!-- 4K Monitor -->
+      <action name="MoveResizeTo"><x>1920</x><y>0</y><height>2110</height><width>1920</width></action>
+      <!-- 1440p Monitor -->
+      <!-- <action name="MoveResizeTo"><x>1280</x><y>0</y><height>1407</height><width>1280</width></action> -->
+      <!-- 1080p Monitor -->
+      <!-- <action name="MoveResizeTo"><x>960</x><y>0</y><height>1055</height><width>960</width></action> -->
     </keybind>
-    <keybind key="W-k">
+    <keybind key="W-k">        # HalfUpperScreen
       <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>0</x>
-        <y>0</y>
-        <width>100%</width>
-        <height>50%</height>
-      </action>
+      <!-- 4K Monitor -->
+      <action name="MoveResizeTo"><x>0</x><y>0</y><width>3840</width><height>1080</height></action>
+      <!-- 1440p Monitor -->
+      <!-- <action name="MoveResizeTo"><x>0</x><y>0</y><width>2560</width><height>720</height></action> -->
+      <!-- 1080p Monitor -->
+      <!--<action name="MoveResizeTo"><x>0</x><y>0</y><width>1920</width><height>540</height></action>-->
     </keybind>
-    <keybind key="W-j">
+    <keybind key="W-j">        # HalfLowerScreen
       <action name="UnmaximizeFull"/>
-      <action name="MoveResizeTo">
-        <x>0</x>
-        <y>-0</y>
-        <width>100%</width>
-        <height>50%</height>
-      </action>
+      <!-- 4k Monitor -->
+      <action name="MoveResizeTo"><x>0</x><y>1080</y><width>3840</width><height>1030</height></action>
+      <!-- 1440p Monitor -->
+      <!-- <action name="MoveResizeTo"><x>0</x><y>720</y><width>2560</width><height>687</height></action> -->
+      <!-- 1080p Monitor -->
+      <!--<action name="MoveResizeTo"><x>0</x><y>540</y><width>1920</width><height>515</height></action>-->
     </keybind>
-    <keybind key="W-e">
-      <action name="Execute">
-        <command>lxsession-default file_manager</command>
-        <startupnotify>
-          <enabled>yes</enabled>
-          <name>File manager</name>
-        </startupnotify>
-      </action>
+    <keybind key="W-equal">
+      <action name="ToggleMaximize"/>
     </keybind>
     <keybind key="W-r">
       <action name="Execute">
