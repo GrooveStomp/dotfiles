@@ -41,7 +41,6 @@
       inferior-lisp-program "/usr/bin/sbcl")
 
 ;; Dependencies.
-(add-to-list 'load-path "~/.emacs.d")
 (require 'paredit)
 ;(require 'highlight-parentheses)
 (require 'tree-mode)
@@ -90,7 +89,7 @@
  '(vc-follow-symlinks t))
 
 ;; Custom functions.
-(load-library "support.el")
+(load-library "~/.emacs.d/support.el")
 ; (load-library "lisp-config.el")
 
 (windmove-default-keybindings)
@@ -144,9 +143,9 @@
 (global-set-key (kbd "M-p")     'backward-paragraph)
 
 
-;(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11") ; 14
+(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11") ; 14
 ;; 4K: 14, 1440P: 12
-(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
+;(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
 ;(set-face-attribute 'default nil :font "Liberation Mono 11") ; 14
 ;(set-face-attribute 'default nil :font "Source Sans Pro 13")
 
