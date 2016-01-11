@@ -6,10 +6,12 @@ function list-functions() {
     echo "shutdown-conflicting-bus-services"
     echo "rename-terminal"
     echo "mysql-copy-database"
+    echo "mysql-db"
     echo "rmq-publish"
-    echo "soa-refresh-mysql-db"
-    echo "docker-gc"
-    echo "git-clean-branches"
+    echo "mogo-refresh-db"
+    echo "mogo-prune-docker-images"
+    echo "mogo-clean-git-branches"
+    echo "mogo-rgtc"
 }
 
 function vmware-recover-keyboard() {
@@ -62,16 +64,31 @@ function rmq-publish() {
     sudo rabbitmqadmin publish exchange=fanout routing_key="$routing_key" properties="$properties" payload="$payload"
 }
 
-function soa-refresh-mysql-db() {
+function mysql-db() {
+    if [[ "-h" == "$1" ]] || [[ "--help" == "$1" ]]; then
+        echo "Usage: ${FUNCNAME[0]} [db]"
+        echo "  db defaults to 'soa_db'"
+        return
+    fi
+
+    db=$1
+    if [[ -z "$db" ]]; then
+        db=soa_db
+    fi
+
+    mysql -u root -h 127.0.0.1 $db
+}
+
+function mogo-refresh-db() {
     RELEASE=$1
 
     if [[ -z "$1" ]]; then
         echo "Usage: ${FUNCNAME[0]} product"
         echo "  eg.: ${FUNCNAME[0]} liquid"
+        echo "  eg.: ${FUNCNAME[0]} dev"
         return
     fi
 
-    pushd /home/aaron/code/mogo/devops/services/soa/liquid > /dev/null 2>&1
     sudo docker-compose kill
     sudo docker rm ${RELEASE}_mysqlschema_1 > /dev/null 2>&1
     sudo docker rm ${RELEASE}_mysql_1 > /dev/null 2>&1
@@ -81,10 +98,9 @@ function soa-refresh-mysql-db() {
         sudo docker rmi -f $IMG > /dev/null 2>&1
     done
     sudo docker-compose up -d
-    popd > /dev/null 2>&1
 }
 
-function docker-gc() {
+function mogo-prune-docker-images() {
     if [[ "-h" == "$1" ]]; then
         echo "Usage: ${FUNCNAME[0]} [options] tag"
         echo -e "\ttag: Tag name, eg. 'liquid_m4' (without quotes)"
@@ -116,7 +132,7 @@ function docker-gc() {
     fi
 }
 
-function git-clean-branches() {
+function mogo-clean-git-branches() {
     if [[ "-h" == "$1" ]]; then
         echo "Usage: ${FUNCNAME[0]}"
         echo "Deletes all local branches not matching 'liquid_m[0-9]+$' or 'master$'"
@@ -126,4 +142,17 @@ function git-clean-branches() {
     git fetch --prune
     git checkout master
     git branch -l | grep -Ev 'liquid_m[0-9]+$' | grep -v 'master$' | xargs git branch -D
+}
+
+function mogo-rgtc() {
+    if [[ "-h" == "$1" ]]; then
+        echo "Usage: ${FUNCNAME[0]}"
+        echo "Means: Mogo [R]evert [G]it [T]esting [C]hanges"
+        echo "Reverts changes to spec/support/circle_ci/db/schema.sql"
+        echo "Reverts changes to Gemfile.lock"
+        return
+    fi
+
+    git checkout -- spec/support/circle_ci/db/schema.sql
+    git checkout -- Gemfile.lock
 }
