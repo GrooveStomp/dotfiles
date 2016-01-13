@@ -41,15 +41,14 @@
       inferior-lisp-program "/usr/bin/sbcl")
 
 ;; Dependencies.
-(add-to-list 'load-path "~/.emacs.d")
 (require 'paredit)
-(require 'highlight-parentheses)
+;(require 'highlight-parentheses)
 (require 'tree-mode)
 (require 'windata)
 (require 'multi-term)
 (require 'tramp)
 (require 'dirtree)
-(require 'auto-complete-exuberant-ctags)
+;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
 ;; Color Themes
@@ -66,15 +65,10 @@
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
 
-; Set the font face.
-;(set-face-attribute 'default t :font "Ubuntu Mono 12")
-;(set-face-attribute 'default t :font "Ubuntu Mono 12");Liberation Mono 10")
-(set-frame-font "-unknown-Liberation Mono-normal-normal-normal-*-12-*-*-*-m-0-iso10646-1")
-
 ; Enable auto-complete.
-(ac-exuberant-ctags-setup)
+;(ac-exuberant-ctags-setup)
 (setq multi-term-program "/bin/bash")
-(auto-complete-mode)
+;(auto-complete-mode)
 
 (defun .add-to-lisp-mode (file-ext)
   (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
@@ -85,20 +79,22 @@
 
 (setenv "PATH" (concat "~/.cabal/bin:" (getenv "PATH")))
 (add-to-list 'exec-path "~/.cabal/bin")
-(custom-set-variables '(haskell-tags-on-save t))
-
-;; Custom functions.
-(load-library "support.el")
-; (load-library "lisp-config.el")
-
-(windmove-default-keybindings)
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"]))
+ '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"])
+ '(haskell-tags-on-save t)
+ '(vc-follow-symlinks t))
+
+;; Custom functions.
+(load-library "~/.emacs.d/support.el")
+; (load-library "lisp-config.el")
+
+(windmove-default-keybindings)
+
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -146,6 +142,14 @@
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
 
+
+(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11") ; 14
+;; 4K: 14, 1440P: 12
+;(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
+;(set-face-attribute 'default nil :font "Liberation Mono 11") ; 14
+;(set-face-attribute 'default nil :font "Source Sans Pro 13")
+
+
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
 (message "My .emacs loaded in %ds"
@@ -154,3 +158,4 @@
                  (second *finish-time*))
               (+ (first *emacs-load-start*)
                  (second *emacs-load-start*)))))
+(put 'narrow-to-region 'disabled nil)

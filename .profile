@@ -23,25 +23,12 @@ fi
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 export TERM=xterm-256color
-export JAVA_HOME=${HOME}/.java/current
-export CLASSPATH=/usr/local/bin/jdbc.jar:.
 
-export PATH=$PATH:${HOME}/script:${HOME}/bin
-export PATH=${HOME}/.cabal/bin:$PATH
-export PATH=/opt/cabal/1.20/bin:$PATH
-export PATH=/opt/ghc/7.8.2/bin:$PATH
-export PATH=/opt/happy/1.19.3:$PATH
-export PATH=/opt/alex/3.1.3/bin:$PATH
-export PATH=${JAVA_HOME}/bin:$PATH
-export PATH=$PATH:.cabal-sandbox/bin
-export PATH=$PATH:$HOME/bin
-export PATH=$PATH:$HOME/code/scala/current/bin
+export PATH=$PATH:${HOME}/scripts:${HOME}/bin
 export PATH=$PATH:$HOME/code/llvm-build/Release+Asserts/bin
 
 export EDITOR=emacs
 
-export PATH="/usr/local/heroku/bin:$PATH"
-export PATH="~/.nodejs/bin:$PATH"
-export PATH="~/code/play/current:$PATH"
-
 export QT_SELECT=qt4
+
+export GOPATH=~/code/go
