@@ -7,3 +7,4 @@
 *.~1~
 .emacs.d
 !.emacs.d/support.el
+.tmux/plugins/
