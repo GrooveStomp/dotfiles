@@ -12,7 +12,128 @@ function list-functions() {
     echo "mogo-prune-docker-images"
     echo "mogo-clean-git-branches"
     echo "mogo-rgtc"
+    echo "mogo-update-soa-docs"
 }
+
+function mogo-update-soa-docs() {
+    if [[ "-h" == "$1" ]] || [[ "--help" == "$1" ]];  then
+        echo "Usage: ${FUNCNAME[0]} [options]"
+        echo "Options:"
+        echo -e "\t-v|--verbose: Verbose output"
+        echo -e "\t-h|--help: This help dialog"
+        return
+    fi
+
+    local silence='> /dev/null 2>&1'
+    local cmd=''
+    local verbose=false
+    if [[ "-v" == "$1" ]] || [[ "--verbose" == "$1" ]]; then
+        verbose=true
+    fi
+
+    local date="$(date +%Y-%m-%d)"
+
+    cmd='pushd ~/code/mogo/soa_docs'
+    $verbose && echo $cmd
+    eval "$cmd $silence"
+
+      local soa_docs_update_branch="$date-update"
+      local soa_docs_current_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+      $verbose && echo "git stash save && git checkout dev && git pull origin dev && git checkout -b $soa_docs_update_branch"
+      git stash save > /dev/null 2>&1 && \
+          git checkout dev > /dev/null 2>&1 && \
+          git pull origin dev > /dev/null 2>&1 && \
+          git checkout -b $soa_docs_update_branch > /dev/null 2>&1
+
+      cmd='pushd ~/code/mogo/docker_compose_files'
+      $verbose && echo $cmd
+      eval "$cmd $silence"
+
+        local devops_current_branch="$(git rev-parse --abbrev-ref HEAD)"
+        $verbose && echo "git stash save && git checkout master && git pull origin master"
+        git stash save > /dev/null 2>&1 && \
+            git checkout master > /dev/null 2>&1 && \
+            git pull origin master > /dev/null 2>&1
+
+        cmd='pushd ~/code/mogo/docker_compose_files/soa/dev > /dev/null 2>&1'
+        $verbose && echo $cmd
+        eval "$cmd $silence"
+
+          $verbose && echo "sudo docker-compose kill && sudo docker-compose pull && sudo docker-compose up -d"
+          sudo docker-compose kill > /dev/null 2>&1 && \
+              sudo docker-compose pull > /dev/null 2>&1 && \
+              sudo docker-compose up -d > /dev/null 2>&1
+
+          cmd='pushd ~/code/mogo/docker_compose_files/soa/scripts > /dev/null 2>&1'
+          $verbose && echo $cmd
+          eval "$cmd $silence"
+
+            sleep 15
+            echo -n "Press any key to continue evaluating Autorun: "
+            read -n 1 -s
+            echo
+            cmd='./autorun.rb --mysql-host-ip 127.0.0.1 --generate-docs'
+            $verbose && echo $cmd
+            eval $cmd
+
+            cmd='cp -f {rmq,http}_documentation.md ~/code/mogo/soa_docs/'
+            $verbose && echo $cmd
+            eval "$cmd $silence"
+
+          cmd='popd'
+          $verbose && echo $cmd
+          eval "$cmd $silence" # ~/code/mogo/docker_compose_files/soa/dev
+
+          cmd='sudo docker-compose kill > /dev/null 2>&1'
+          $verbose && echo $cmd
+          eval "$cmd $silence"
+
+
+        cmd='popd'
+        $verbose && echo $cmd
+        eval "$cmd $silence" # ~/code/mogo/docker_compose_files
+
+        cmd="git checkout $devops_current_branch"
+        $verbose && echo $cmd
+        eval "$cmd $silence"
+
+        cmd='pushd ~/code/mogo/docker_compose_files/soa/dev'
+        $verbose && echo $cmd
+        eval "$cmd $silence"
+
+          $verbose && echo 'sudo docker-compose kill && sudo docker-compose pull'
+          sudo docker-compose kill > /dev/null 2>&1 && \
+              sudo docker-compose pull > /dev/null 2>&1
+
+        cmd='popd'
+        $verbose && echo $cmd
+        eval "$cmd $silence" # ~/code/mogo/docker_compose_files
+
+      cmd='popd'
+      $verbose && echo $cmd
+      eval "$cmd $silence" # ~/code/mogo/soa_docs
+
+      $verbose && echo "git add . && git commit -m \"$date documentation update\" && git push origin $soa_docs_update_branch && git checkout $soa_docs_current_branch"
+      git add . > /dev/null 2>&1 && \
+          git commit -m "$date documentation update" > /dev/null 2>&1 && \
+          git push origin $soa_docs_update_branch > /dev/null 2>&1 && \
+          git checkout $soa_docs_current_branch > /dev/null 2>&1
+
+    cmd='popd'
+    $verbose && echo $cmd
+    eval "$cmd $silence" # starting directory
+}
+
+# /home/aaron/.rubies/ruby-2.2.2/lib/ruby/2.2.0/json/common.rb:155:in `parse': 757: unexpected token at '<html><body><h1>503 Service Unavailable</h1> (JSON::ParserError)
+# No server is available to handle this request.
+# </body></html>'
+#         from /home/aaron/.rubies/ruby-2.2.2/lib/ruby/2.2.0/json/common.rb:155:in `parse'
+#         from ./autorun.rb:113:in `post'
+#         from ./autorun.rb:180:in `signup'
+#         from ./autorun.rb:491:in `block in <main>'
+#         from ./autorun.rb:415:in `with_timer'
+#         from ./autorun.rb:482:in `<main>'
 
 function vmware-recover-keyboard() {
     echo "WARNING! Specific to System76 Galago UltraPro with Kinesis Advantage keyboard."
