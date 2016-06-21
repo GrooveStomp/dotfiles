@@ -2,6 +2,13 @@
 # Functions to help out with random tasks at Mogo.
 #
 function list-functions() {
+    echo "app-grep"
+    echo "app-tree"
+    echo "docker-build-image"
+    echo "docker-run-container"
+    echo "docker-debug-container"
+    echo "docker-logs"
+    echo "docker-remove-none-images"
     echo "vmware-recover-keyboard"
     echo "shutdown-conflicting-bus-services"
     echo "rename-terminal"
@@ -13,6 +20,32 @@ function list-functions() {
     echo "mogo-clean-git-branches"
     echo "mogo-rgtc"
     echo "mogo-update-soa-docs"
+}
+
+function contains_help_flag() {
+    for i in "$@"; do
+        if [[ "-h" = "$i" ]] || [[ "--help" = "$i" ]]; then
+            echo "1"
+            return
+        fi
+    done
+    echo ""
+}
+
+function app-grep() {
+    grep "$@" | grep -v env | grep -v spec | grep -v schema
+}
+
+function app-tree() {
+    tree -I "env|spec" "$@"
+}
+
+function docker-logs() {
+    docker logs --since `date +%Y-%m-%dT%H:%M:%S` "$@"
+}
+
+function docker-remove-none-images () {
+  sudo docker rmi $(sudo docker images | grep none | awk '{print $3}') ;
 }
 
 function mogo-update-soa-docs() {
@@ -147,6 +180,8 @@ function shutdown-conflicting-bus-services() {
     sudo service apache2 stop > /dev/null 2>&1
     sudo service redis-server stop > /dev/null 2>&1
     sudo service rabbitmq-server stop > /dev/null 2>&1
+    # NOTE(AARON): Mariadb is an asshole and doesn't quit properly.
+    ps aux | grep [m]ysql | awk '{print $2}' | xargs sudo kill -9
 }
 
 function rename-terminal() {
@@ -213,7 +248,7 @@ function mogo-refresh-db() {
     sudo docker-compose kill
     sudo docker rm ${RELEASE}_mysqlschema_1 > /dev/null 2>&1
     sudo docker rm ${RELEASE}_mysql_1 > /dev/null 2>&1
-    # NOTE(AARON): The following commented-out block seems unnecessary and slow.
+
     IMAGES=$(sudo docker images | grep schema | grep $RELEASE | awk '{print $3}')
     for IMG in "${IMAGES[@]}"; do
         sudo docker rmi -f $IMG > /dev/null 2>&1
@@ -276,4 +311,101 @@ function mogo-rgtc() {
 
     git checkout -- spec/support/circle_ci/db/schema.sql
     git checkout -- Gemfile.lock
+}
+
+function docker-build-image() {
+    function usage() {
+        echo "Usage: ${FUNCNAME[0]} [options] image-tag"
+        echo "Builds a Docker image assuming a Dockerfile in the current directory"
+        echo
+        echo "options are passed through to the docker command"
+    }
+
+    local wants_help=$(contains_help_flag "$@")
+    if [ ! -z "$wants_help" ]; then usage; return; fi
+
+    local args="${@:1:${#}-1}" # Set args to all but last argument.
+    local tag="${@: -1}" # Set $tag to last argument.
+
+    if [[ -z "$tag" ]]; then usage; return; fi
+
+    docker build $args -t $tag .
+}
+
+function docker-run-container() {
+    function usage() {
+        echo
+        echo "Usage: ${FUNCNAME[0]} links image-tag"
+        echo -e "\tlinks: comma-separated list of services to link with or --link-all or --link-none. No spaces"
+        echo -e "\teg.: ${FUNCNAME[0]} --link-all local-service"
+        echo
+        echo " Export environment variables starting with 'MOGO_' to have this function forward them to the container."
+        echo
+    }
+
+    local wants_help=$(contains_help_flag "$@")
+    if [ ! -z "$wants_help" ]; then usage; return; fi
+    if [[ -z "$1" || -z "$2" ]]; then usage; return; fi
+
+    raw_links=$1
+    tag=$2
+
+    link_string=""
+    if [[ "--link-none" == "$raw_links" ]]; then
+        link_string=""
+    elif [[ "--link-all" == "$raw_links" ]]; then
+        link_string=" --link dev_mysql_1:mysql --link dev_bus_1:bus --link dev_redis_1:redis --link dev_httpservice_1:http"
+    else
+        IFS=',' read -ra links <<< "$raw_links"
+        for i in "${links[@]}"; do
+            link_string="$link_string --link dev_${i}_1:${i}"
+        done
+    fi
+
+    pass_through_vars=""
+    while read env_var; do
+        tmp=$(echo $env_var | awk '{ gsub("^MOGO_", "", $1); print $1}')
+        [[ -z "$tmp" ]] || pass_through_vars="$pass_through_vars -e $tmp"
+    done <<< "$(env | grep '^MOGO_')"
+
+    docker rm -f $tag > /dev/null 2>&1
+    docker run -it $link_string --name $tag \
+           $pass_through_vars \
+           -e DB_HOST=mysql \
+           -e DB_USERNAME=root \
+           -e DB_PASSWORD= \
+           -e MQ_HOST=bus \
+           -e MQ_VHOST=/ \
+           -e REDIS_HOST=redis \
+           -e REDIS_PORT=6379 \
+           -e REDIS_DB=0 \
+           -e VERIFY_ACCOUNT=false \
+           $tag
+}
+
+function docker-build-and-run() {
+    if [[ "-h" == "$1" || -z "$1" || -z "$2" ]]; then
+        echo
+        echo "Usage: ${FUNCNAME[0]} links image-tag"
+        echo -e "\tlinks: comma-separated list of services to link with or --link-all. No spaces"
+        echo -e "\teg.: ${FUNCNAME[0]} --link-all local-service"
+        echo
+        return
+    fi
+
+    docker-build-image $2 && docker-run-container $1 $2
+}
+
+function docker-debug-container() {
+    if [[ "-h" == "$1" || -z "$1" ]]; then
+        echo
+        echo "Usage: ${FUNCNAME[0]} container-name"
+        echo -e "\teg.: ${FUNCNAME[0]} local-agreement"
+        echo
+        return
+    fi
+
+    local container=$1
+    docker rm -f $container > /dev/null 2>&1
+    docker run -it --name $container --link dev_bus_1:bus --link dev_mysql_1:mysql $container /bin/bash
 }
