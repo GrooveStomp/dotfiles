@@ -22,14 +22,100 @@ function list-functions() {
     echo "mogo-update-soa-docs"
 }
 
-function contains_help_flag() {
-    for i in "$@"; do
-        if [[ "-h" = "$i" ]] || [[ "--help" = "$i" ]]; then
+function has_arg() {
+    local __args=($@)
+    local argc=${#__args[@]}
+    local last_arg=${__args[$argc-1]}
+    local args=${__args[@]:0:$argc-1}
+
+    local arg="$last_arg"
+    if [[ -z "$arg" ]]; then return; fi
+
+    for i in $args; do
+        if [[ "$arg" = "$i" ]]; then
             echo "1"
             return
         fi
     done
-    echo ""
+}
+
+function arg_index() {
+    local __args=($@)
+    local argc=${#__args[@]}
+    local last_arg=${__args[$argc-1]}
+    local args=${__args[@]:0:$argc-1}
+
+    local arg="$last_arg"
+    if [[ -z "$arg" ]]; then return; fi
+
+    local index=0
+    for i in $args; do
+        if [[ "$arg" = "$i" ]]; then
+            echo "$index"
+            return
+        else
+            ((index++))
+        fi
+    done
+}
+
+function arg_at_index() {
+    local __args=($@)
+    local argc=${#__args[@]}
+    local last_arg=${__args[$argc-1]}
+    local args=${__args[@]:0:$argc-1}
+
+    local wanted_index="$last_arg"
+    if [[ -z "$wanted_index" ]]; then return; fi
+
+    local index=0
+    for i in $args; do
+        if [[ "$index" = "$wanted_index" ]]; then
+            echo "$i"
+            return
+        else
+            ((index++))
+        fi
+    done
+}
+
+function get_arg_after() {
+    local __args=($@)
+    local argc=${#__args[@]}
+    local last_arg=${__args[$argc-1]}
+    local args=${__args[@]:0:$argc-1}
+
+    local arg="$last_arg"
+    if [[ -z "$arg" ]]; then return; fi
+
+    local index=$(arg_index "$args" "$arg")
+    if [[ -z "$index" ]]; then return; fi
+
+    ((index++))
+    echo $(arg_at_index "$args" "$index")
+}
+
+function test_arg_functions() {
+    local __args=($@)
+    local argc=${#__args[@]}
+
+    local last_arg=${__args[$argc-1]}
+    local args=${__args[@]:0:$argc-1}
+
+    echo "has arg: $(has_arg $args $last_arg)"
+    local index=$(arg_index $args $last_arg)
+    echo "arg index: $index"
+    echo "arg at index: $(arg_at_index $args $index)"
+    echo "get arg after: $(get_arg_after $args $last_arg)"
+}
+
+function is_help_flag_present() {
+    local args=$@
+
+    if [[ $(has_arg $args "-h") || $(has_arg $args "--help") ]]; then
+        echo "true"
+        return
+    fi
 }
 
 function app-grep() {
@@ -41,7 +127,7 @@ function app-tree() {
 }
 
 function docker-logs() {
-    docker logs --since `date +%Y-%m-%dT%H:%M:%S` "$@"
+    docker logs -f --since `date +%Y-%m-%dT%H:%M:%S` "$@"
 }
 
 function docker-remove-none-images () {
@@ -314,6 +400,8 @@ function mogo-rgtc() {
 }
 
 function docker-build-image() {
+    local args=$@
+
     function usage() {
         echo "Usage: ${FUNCNAME[0]} [options] image-tag"
         echo "Builds a Docker image assuming a Dockerfile in the current directory"
@@ -321,7 +409,7 @@ function docker-build-image() {
         echo "options are passed through to the docker command"
     }
 
-    local wants_help=$(contains_help_flag "$@")
+    local wants_help=$(is_help_flag_present $args)
     if [ ! -z "$wants_help" ]; then usage; return; fi
 
     local args="${@:1:${#}-1}" # Set args to all but last argument.
@@ -333,6 +421,8 @@ function docker-build-image() {
 }
 
 function docker-run-container() {
+    local args=$@
+
     function usage() {
         echo
         echo "Usage: ${FUNCNAME[0]} links image-tag"
@@ -343,7 +433,7 @@ function docker-run-container() {
         echo
     }
 
-    local wants_help=$(contains_help_flag "$@")
+    local wants_help=$(is_help_flag_present $args)
     if [ ! -z "$wants_help" ]; then usage; return; fi
     if [[ -z "$1" || -z "$2" ]]; then usage; return; fi
 
@@ -407,5 +497,8 @@ function docker-debug-container() {
 
     local container=$1
     docker rm -f $container > /dev/null 2>&1
-    docker run -it --name $container --link dev_bus_1:bus --link dev_mysql_1:mysql $container /bin/bash
+    docker run -it --name $container --link dev_bus_1:bus --link dev_mysql_1:mysql \
+           -e DB_HOST=mysql -e DB_USERNAME=root -e DB_PASSWORD= \
+           -e MQ_HOST=bus -e MQ_VHOST=/ \
+           $container /bin/bash
 }
