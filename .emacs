@@ -2,8 +2,8 @@
 
 ;; ELPA Package manager setup.
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+;(add-to-list 'package-archives
+;             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
@@ -18,6 +18,13 @@
 (setq inhibit-startup-screen t ; Disable splash screen.
       column-number-mode t ; Show column numbers
       indent-line-function 'insert-tab)
+
+;; Case-sensitive query-replace.
+(defadvice replace-string (around turn-off-case-fold-search)
+  (let ((case-fold-search nil))
+    ad-do-it))
+
+(ad-activate 'replace-string)
 
 ;; GUI Options.
 (global-font-lock-mode 1)
@@ -51,17 +58,6 @@
 ;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
-;; Color Themes
-;; NOTE(AARON): Only require color themes I'm actually using.
-;; These are just here for whenever I want to try them out and try something different.
-; (require 'color-theme-molokai)
-; (require 'color-theme-monokai)
-; (require 'color-theme-railscasts)
-; (require 'color-theme-solarized)
-; (require 'color-theme-tango)
-; (color-theme-tango)
-(load-theme 'railscasts t nil)
-
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
 
@@ -74,18 +70,18 @@
   (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
 (mapcar '.add-to-lisp-mode '("\\.emacs$" "\\.cl$" "\\.asd$" "\\.el$"))
 
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indentation)
-(add-hook 'clojure-mode-hook 'paredit-mode)
-
-(setenv "PATH" (concat "~/.cabal/bin:" (getenv "PATH")))
-(add-to-list 'exec-path "~/.cabal/bin")
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"])
- '(haskell-tags-on-save t)
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
+ '(ansi-color-names-vector
+   ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"])
+ '(custom-safe-themes
+   (quote
+    ("3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
  '(vc-follow-symlinks t))
 
 ;; Custom functions.
@@ -142,13 +138,26 @@
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
 
+(setq c-default-style "linux")
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (setq tab-width 8)
+            (setq c-basic-offset 8)
+            ;; Make `case' statements in `switch' blocks indent normally.
+            (c-set-offset 'case-label '+)))
 
-(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 11") ; 14
+;(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 12") ; 14
+;(set-face-attribute 'default nil :font "Deja Vu Sans Mono 13")
 ;; 4K: 14, 1440P: 12
 ;(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
-;(set-face-attribute 'default nil :font "Liberation Mono 11") ; 14
+(set-face-attribute 'default nil :font "Liberation Mono 13") ; 14
 ;(set-face-attribute 'default nil :font "Source Sans Pro 13")
 
+;; Color Themes
+;(load-theme 'railscasts t nil)
+;(load-theme 'solarized t nil)
+;(load-theme 'sanityinc-solarized-dark)
+(color-theme-monokai)
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
