@@ -2,6 +2,8 @@
 # Functions to help out with random tasks at Mogo.
 #
 function list-functions() {
+    echo "git-clean-branches"
+    echo "git-drop-changes"
     echo "app-grep"
     echo "app-tree"
     echo "docker-build-image"
@@ -9,16 +11,16 @@ function list-functions() {
     echo "docker-debug-container"
     echo "docker-logs"
     echo "docker-remove-none-images"
+    echo "docker-refresh-db"
+    echo "docker-prune-images"
+    echo "docker-nuclear"
+    echo "dc"
     echo "vmware-recover-keyboard"
     echo "shutdown-conflicting-bus-services"
     echo "rename-terminal"
     echo "mysql-copy-database"
     echo "mysql-db"
     echo "rmq-publish"
-    echo "mogo-refresh-db"
-    echo "mogo-prune-docker-images"
-    echo "mogo-clean-git-branches"
-    echo "mogo-rgtc"
     echo "mogo-update-soa-docs"
 }
 
@@ -109,15 +111,15 @@ function test_arg_functions() {
     echo "get arg after: $(get_arg_after $args $last_arg)"
 }
 
-function is_help_flag_present() {
+function has_help_flag() {
     local args=$@
 
     if [[ $(has_arg $args "-h") || $(has_arg $args "--help") ]]; then
         echo "true"
         return
     fi
-}
 
+}
 function app-grep() {
     grep "$@" | grep -v env | grep -v spec | grep -v schema
 }
@@ -127,11 +129,36 @@ function app-tree() {
 }
 
 function docker-logs() {
-    docker logs -f --since `date +%Y-%m-%dT%H:%M:%S` "$@"
+    docker logs -f --since `date +%Y-%m-%dT%H:%M:%S` $@
 }
 
 function docker-remove-none-images () {
-  sudo docker rmi $(sudo docker images | grep none | awk '{print $3}') ;
+    local name=${FUNCNAME[0]}
+    local args=$@
+
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: $name"
+        echo "Removes images with <none> tag"
+        return
+    fi
+
+    local images=$(docker images | grep none)
+    if [[ -n $images ]]; then
+        docker rmi -f $(echo $images | awk '{print $3}')
+    fi
+}
+
+function dc() {
+    local args=$@
+    local name=${FUNCNAME[0]}
+
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: $name parameters"
+        echo "Just a wrapper function around docker-compose that uses dockerhub instead of quay.io."
+        return
+    fi
+
+    docker-compose -f /home/aaron/code/mogo/docker_compose_files/soa/dev/dockerhub-docker-compose.yml "$@"
 }
 
 function mogo-update-soa-docs() {
@@ -307,45 +334,52 @@ function rmq-publish() {
 }
 
 function mysql-db() {
-    if [[ "-h" == "$1" ]] || [[ "--help" == "$1" ]]; then
-        echo "Usage: ${FUNCNAME[0]} [db]"
-        echo "  db defaults to 'soa_db'"
+    local name=${FUNCNAME[0]}
+
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: ${name} parameters"
+        echo "Simple wrapper around mysql client. Connects as root on host 127.0.0.1."
+        echo "All parameters are passed directly to mysql-client"
         return
     fi
 
-    db=$1
-    if [[ -z "$db" ]]; then
-        db=soa_db
-    fi
-
-    mysql -u root -h 127.0.0.1 $db
+    mysql -u root -h 127.0.0.1 "$@"
 }
 
-function mogo-refresh-db() {
-    RELEASE=$1
+function docker-refresh-db() {
+    local name=${FUNCNAME[0]}
+    local args=$@
 
-    if [[ -z "$1" ]]; then
-        echo "Usage: ${FUNCNAME[0]} product"
-        echo "  eg.: ${FUNCNAME[0]} liquid"
-        echo "  eg.: ${FUNCNAME[0]} dev"
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: ${name}"
+        echo "options:"
+        echo -e "\t--branch: which branch to use. Defaults to \`dev'"
         return
     fi
 
-    sudo docker-compose kill
-    sudo docker rm ${RELEASE}_mysqlschema_1 > /dev/null 2>&1
-    sudo docker rm ${RELEASE}_mysql_1 > /dev/null 2>&1
+    local branch="dev"
+    if [[ $(has_arg $args "--branch") ]]; then
+        branch=$(get_arg_after $args "--branch")
+    fi
 
-    IMAGES=$(sudo docker images | grep schema | grep $RELEASE | awk '{print $3}')
+    docker-compose kill
+    docker rm ${branch}_mysqlschema_1 > /dev/null 2>&1
+    docker rm ${branch}_mysql_1 > /dev/null 2>&1
+
+    IMAGES=$(docker images | grep schema | grep $branch | awk '{print $3}')
     for IMG in "${IMAGES[@]}"; do
-        sudo docker rmi -f $IMG > /dev/null 2>&1
+        docker rmi -f $IMG > /dev/null 2>&1
     done
-    sudo docker-compose up -d
+    docker-compose $args up -d
 }
 
-function mogo-prune-docker-images() {
-    if [[ "-h" == "$1" ]]; then
-        echo "Usage: ${FUNCNAME[0]} [options] tag"
-        echo -e "\ttag: Tag name, eg. 'liquid_m4' (without quotes)"
+function docker-prune-images() {
+    local name=${FUNCNAME[0]}
+    local tag=${__args[$argc-1]}
+
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: $name [options] tag"
+        echo -e "\ttag: Tag name, eg.: liquid_m4, dev, latest (single label only)"
         echo -e ""
         echo "Options:"
         echo -e "\t-h: This help dialog"
@@ -353,50 +387,89 @@ function mogo-prune-docker-images() {
     fi
 
     echo "Removing dangling images"
-    images=$(sudo docker images -q -f "dangling=true")
+    images=$(docker images -q -f "dangling=true")
     if [[ "" != "$images" ]]; then
-        sudo docker rmi -f $images
+        docker rmi -f $images
     fi
 
     echo "Removing images tagged '<none>'"
-    images=$(sudo docker images | grep '<none>' | tr -s ' ' | cut -d ' ' -f 3)
+    images=$(docker images | grep '<none>' | tr -s ' ' | cut -d ' ' -f 3)
     if [[ "" != "$images" ]]; then
-        sudo docker rmi -f $images
+        docker rmi -f $images
     fi
 
-    TAG=$1
-    echo "Removing images identified by '$TAG'"
-    if [[ "-h" != "$1" ]] || [[ "" != "$1" ]]; then
-        images=$(sudo docker images | grep "$TAG" | tr -s ' ' | cut -d ' ' -f 3)
+    echo "Removing images identified by '$tag'"
+    if [[ "-h" != "$tag" ]] || [[ "" != "$tag" ]]; then
+        images=$(docker images | grep "$tag" | tr -s ' ' | cut -d ' ' -f 3)
         if [[ "" != "$images" ]]; then
-            sudo docker rmi -f $images
+            docker rmi -f $images
         fi
     fi
 }
 
-function mogo-clean-git-branches() {
-    if [[ "-h" == "$1" ]]; then
-        echo "Usage: ${FUNCNAME[0]}"
-        echo "Deletes all local branches not matching 'liquid_m[0-9]+$' or 'master$'"
-        return
-    fi
-
-    git fetch --prune
-    git checkout master
-    git branch -l | grep -Ev 'liquid_m[0-9]+$' | grep -v 'master$' | xargs git branch -D
+function docker-nuclear() {
+    dc kill
+    shutdown-conflicting-bus-services
+    dc rm
+    docker-remove-none-images
+    docker-prune-images
+    service systemctl restart docker
+    dc pull
+    dc up -d
 }
 
-function mogo-rgtc() {
-    if [[ "-h" == "$1" ]]; then
-        echo "Usage: ${FUNCNAME[0]}"
-        echo "Means: Mogo [R]evert [G]it [T]esting [C]hanges"
-        echo "Reverts changes to spec/support/circle_ci/db/schema.sql"
-        echo "Reverts changes to Gemfile.lock"
+function git-clean-branches() {
+    local args=$@
+    local name=${FUNCNAME[0]}
+
+    if [[ $(has_help_flag $args) ]]; then
+        echo "Usage: $name [options]"
+        echo "Deletes all local branches except for the branch you are currently on."
+        echo
+        echo "Options:"
+        echo -e "\t--keep: comma-separated list of branch names to keep"
+        echo -e "\t        eg.: master,dev"
         return
     fi
 
-    git checkout -- spec/support/circle_ci/db/schema.sql
-    git checkout -- Gemfile.lock
+    local keep=
+    if [[ $(has_arg $args "--keep") ]]; then
+        keep=$(get_arg_after $args "--keep")
+    fi
+
+    local ignore_string="grep -v \*"
+    local keep_array=
+    IFS=',' read -ra keep_array <<< "$keep"
+    for i in "${keep_array[@]}"; do
+        ignore_string="$ignore_string | grep -v $i"
+    done
+
+    local branches=$(eval "git branch -l | $ignore_string")
+    if [[ -z "$branches" ]]; then return; fi
+
+    local command="git branch -l | $ignore_string | xargs git branch -D"
+    eval $command
+}
+
+function git-drop-changes()
+{
+    local args=$@
+    local name="${FUNCNAME[0]}"
+
+    function usage() {
+        echo "Usage: $name"
+        echo
+        echo "Drops all local changes"
+        echo
+    }
+
+    local wants_help=$(has_help_flag $args)
+    if [ ! -z "$wants_help" ]; then usage; return; fi
+
+    local output=$(git stash save)
+    if [[ "No local changes to save" != "$output" ]]; then
+        git stash drop stash@{0} > /dev/null
+    fi
 }
 
 function docker-build-image() {
@@ -409,7 +482,7 @@ function docker-build-image() {
         echo "options are passed through to the docker command"
     }
 
-    local wants_help=$(is_help_flag_present $args)
+    local wants_help=$(has_help_flag $args)
     if [ ! -z "$wants_help" ]; then usage; return; fi
 
     local args="${@:1:${#}-1}" # Set args to all but last argument.
@@ -433,7 +506,7 @@ function docker-run-container() {
         echo
     }
 
-    local wants_help=$(is_help_flag_present $args)
+    local wants_help=$(has_help_flag $args)
     if [ ! -z "$wants_help" ]; then usage; return; fi
     if [[ -z "$1" || -z "$2" ]]; then usage; return; fi
 
