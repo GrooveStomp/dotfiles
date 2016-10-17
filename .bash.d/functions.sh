@@ -2,6 +2,8 @@
 # Functions to help out with random tasks at Mogo.
 #
 function list-functions() {
+    echo "autorun-aaron"
+    echo "startup"
     echo "git-clean-branches"
     echo "git-drop-changes"
     echo "app-grep"
@@ -22,6 +24,52 @@ function list-functions() {
     echo "mysql-db"
     echo "rmq-publish"
     echo "mogo-update-soa-docs"
+}
+
+function autorun-aaron() {
+    local path=$(find ~ -name 'autorun')
+    local firefox=
+    source "${path}/env/shell" &&
+        bundle_install > /dev/null 2>&1 &&
+        AUTORUN_ROOT=/home/aaron/code/mogo/docker_compose_files/soa/autorun \
+        autorun --firefox /home/aaron/code/firefox/46.0.1/firefox \
+                --firefox-profile 46.0.1
+}
+
+function startup() {
+    # NOTE(AARON): I have systemd set up to run a custom ssh-agent script.
+    # See: https://wiki.archlinux.org/index.php/SSH_keys#ssh-agent
+    # cat ~/.config/systemd/user/ssh-agent.service
+    # --------------------------------------------------------------------------
+    # [Unit]
+    # Description=SSH key agent
+
+    # [Service]
+    # Type=forking
+    # Environment=SSH_AUTH_SOCK=%t/ssh-agent.socket
+    # ExecStart=/usr/bin/ssh-agent -a $SSH_AUTH_SOCK
+
+    # [Install]
+    # WantedBy=default.target
+    # --------------------------------------------------------------------------
+    #
+    # Then: systemctl --user enable ssh-agent.service # Enables it on future startups.
+    # systemctl --user start ssh-agent.service # Starts it now.
+    ssh-add ~/.ssh/id_rsa
+
+    # Xbindkeys custom keyboard shortcuts
+    local xbindkeys_pid=$(ps aux | grep [x]bindkeys | awk '{print $2}')
+    if [[ -z $xbindkeys_pid ]]; then
+        xbindkeys -f ~/.xbindkeysrc.scm
+    fi
+
+    # Kill conflicting services.
+    (shutdown-conflicting-bus-services) >/dev/null 2>&1
+
+    # Start private internet access VPN.
+    # This comes from yaourt. pia-launch.
+    (sudo killall pia-launch) >/dev/null 2>&1
+    (sudo pia-launch &) >/dev/null 2>&1
 }
 
 function has_arg() {
@@ -158,7 +206,11 @@ function dc() {
         return
     fi
 
-    docker-compose -f /home/aaron/code/mogo/docker_compose_files/soa/dev/dockerhub-docker-compose.yml "$@"
+    local exe=$(which docker-compose)
+    local root_path=$(find ~ -name 'docker_compose_files' 2>/dev/null)
+    local file="${root_path}/soa/dev/docker-compose.yml"
+
+    $exe -f $file $args
 }
 
 function mogo-update-soa-docs() {
@@ -293,8 +345,7 @@ function shutdown-conflicting-bus-services() {
     sudo service apache2 stop > /dev/null 2>&1
     sudo service redis-server stop > /dev/null 2>&1
     sudo service rabbitmq-server stop > /dev/null 2>&1
-    # NOTE(AARON): Mariadb is an asshole and doesn't quit properly.
-    ps aux | grep [m]ysql | awk '{print $2}' | xargs sudo kill -9
+#    ps aux | grep [m]ysql | awk '{print $2}' | xargs sudo kill -9
 }
 
 function rename-terminal() {

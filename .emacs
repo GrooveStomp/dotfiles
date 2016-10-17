@@ -2,8 +2,8 @@
 
 ;; ELPA Package manager setup.
 (require 'package)
-;(add-to-list 'package-archives
-;             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (package-initialize)
@@ -11,6 +11,8 @@
 ;; Global vars.
 (defvar *emacs-load-start* (current-time))
 
+;; Always follow symlinks.
+(setq vc-follow-symlinks t)
 ;; General Emacs settings.
 (set-default 'truncate-lines t)
 (setq-default indent-tabs-mode nil
@@ -75,14 +77,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   ["black" "red" "chartreuse2" "yellow" "light sky blue" "plum3" "cyan" "white"])
- '(custom-safe-themes
+ '(package-selected-packages
    (quote
-    ("3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" default)))
- '(vc-follow-symlinks t))
+    (go-mode color-theme-monokai highlight-parentheses paredit))))
 
 ;; Custom functions.
 (load-library "~/.emacs.d/support.el")
@@ -96,9 +93,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(term-color-blue ((t (:background "light sky blue" :foreground "light sky blue"))))
- '(term-color-green ((t (:background "chartreuse2" :foreground "chartreuse2"))))
- '(term-color-magenta ((t (:background "plum3" :foreground "plum3")))))
+ )
 
 ; Bright-red TODOs
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode ruby-mode))
@@ -154,10 +149,11 @@
 ;(set-face-attribute 'default nil :font "Source Sans Pro 13")
 
 ;; Color Themes
-;(load-theme 'railscasts t nil)
-;(load-theme 'solarized t nil)
-;(load-theme 'sanityinc-solarized-dark)
-(color-theme-monokai)
+                                        ;
+;(color-theme-railscasts)
+;(color-theme-solarized)
+(color-theme-molokai)
+;(color-theme-monokai)
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
