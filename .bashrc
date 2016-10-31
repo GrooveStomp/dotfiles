@@ -78,3 +78,5 @@ function compose_prompt() {
 }
 
 PROMPT_COMMAND=compose_prompt
+PLAN9=/usr/local/plan9 export PLAN9
+PATH=/home/aaron/.gem/ruby/2.2.5/bin:/home/aaron/.rubies/ruby-2.2.5/lib/ruby/gems/2.2.0/bin:/home/aaron/.rubies/ruby-2.2.5/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/bin export PATH

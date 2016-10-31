@@ -8,6 +8,7 @@ function list-functions() {
     echo "git-drop-changes"
     echo "app-grep"
     echo "app-tree"
+    echo "display-configure"
     echo "docker-build-image"
     echo "docker-run-container"
     echo "docker-debug-container"
@@ -68,8 +69,8 @@ function startup() {
 
     # Start private internet access VPN.
     # This comes from yaourt. pia-launch.
-    (sudo killall pia-launch) >/dev/null 2>&1
-    (sudo pia-launch &) >/dev/null 2>&1
+#    (sudo killall pia-launch) >/dev/null 2>&1
+#    (sudo pia-launch &) >/dev/null 2>&1
 }
 
 function has_arg() {
@@ -625,4 +626,27 @@ function docker-debug-container() {
            -e DB_HOST=mysql -e DB_USERNAME=root -e DB_PASSWORD= \
            -e MQ_HOST=bus -e MQ_VHOST=/ \
            $container /bin/bash
+}
+
+function display-configure() {
+    local args=$@
+
+    function usage() {
+        echo
+        echo "Usage: ${FUNCNAME[0]} [options]"
+        echo "Configures my Galago UltraPro work laptop according to various situations."
+        echo
+        echo "Options:"
+        echo -e "\t-h|--help: This help text"
+        echo
+    }
+
+    local wants_help=$(has_help_flag $args)
+    if [ ! -z "$wants_help" ]; then usage; return; fi
+
+    local configure_for_work=$(has_arg $args "--work")
+    if [ ! -z "$configure_for_work" ]; then
+        xrandr --output eDP1 --off # Laptop monitor.
+        xrandr --output DP1 --mode 3840x2160 # 4k work monitor.
+    fi
 }

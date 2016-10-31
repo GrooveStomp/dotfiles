@@ -77,9 +77,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("e0d42a58c84161a0744ceab595370cbe290949968ab62273aed6212df0ea94b4" "e9776d12e4ccb722a2a732c6e80423331bcb93f02e089ba2a4b02e85de1cf00e" "3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" default)))
  '(package-selected-packages
    (quote
-    (go-mode color-theme-monokai highlight-parentheses paredit))))
+    (sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit))))
 
 ;; Custom functions.
 (load-library "~/.emacs.d/support.el")
@@ -141,19 +144,12 @@
             ;; Make `case' statements in `switch' blocks indent normally.
             (c-set-offset 'case-label '+)))
 
-;(set-face-attribute 'default nil :font "Bitstream Vera Sans Mono 12") ; 14
-;(set-face-attribute 'default nil :font "Deja Vu Sans Mono 13")
-;; 4K: 14, 1440P: 12
-;(set-face-attribute 'default nil :font "Fantasque Sans Mono 14")
-(set-face-attribute 'default nil :font "Liberation Mono 13") ; 14
-;(set-face-attribute 'default nil :font "Source Sans Pro 13")
+(set-face-attribute 'default nil :font "Deja Vu Sans Mono 12")
 
 ;; Color Themes
-                                        ;
-;(color-theme-railscasts)
-;(color-theme-solarized)
-(color-theme-molokai)
-;(color-theme-monokai)
+;; https://github.com/owainlewis/emacs-color-themes
+(add-to-list 'custom-theme-load-path "~/.emacs.d/elpa/sublime-themes-20160111.122/")
+(load-theme 'dorsey t)
 
 ;; Finish calculating total load time for .emacs.
 (defvar *finish-time* (current-time))
