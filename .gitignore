@@ -8,3 +8,5 @@
 .emacs.d
 !.emacs.d/support.el
 .tmux/plugins/
+.textadept/session
+.textadept/session_term
