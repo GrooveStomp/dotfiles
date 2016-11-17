@@ -1,17 +1,28 @@
--- TODO(AARON):
--- * M-o doesn't work properly on the first line of the file.
--- * Write buffer name when saving with "C-x s".
--- * Implement incremental forward search.
--- * Implement incremental backward search.
--- * Fix buggy C-x k closing of views.
--- * See if it's possible to properly hide all scrollbars all the time.
--- * Implement C-x 0 to close the current view.
--- * Implement C-x 1 to close all views other than the current one.
--- * M-f should go to the end of the word, not the beginning of the next one.
--- * Don't put closing single or double quote when typing one.
--- * Don't put closing parenthesis, bracket or brace when typing one.
+--[[
+TODO(AARON):
+- M-o doesn't work properly on the first line of the file.
+- Write buffer name when saving with "C-x s".
+- Implement incremental forward search.
+- Implement incremental backward search.
+- Fix buggy C-x k closing of views.
+- See if it's possible to properly hide all scrollbars all the time.
+- Implement C-x 0 to close the current view.
+- M-f should go to the end of the word, not the beginning of the next one.
+- Don't put closing single or double quote when typing one.
+- Don't put closing parenthesis, bracket or brace when typing one.
+- C-k should cut to the clipboard.
+- M-g <tab> should go to column number on current line after prompt.
+--]]
+
+_EMACS = {}
 
 keys.CLEAR = 'cg'
+
+keys['cg'] = function()
+  if _EMACS["search"] then
+    _EMACS["search"] = nil
+  end
+end
 
 keys['ca'] = buffer.home
 keys['ce'] = buffer.line_end
@@ -34,11 +45,19 @@ end
 keys['ag'] = {
     ['ag'] = function()
       _,line = ui.dialogs.inputbox{title = 'Goto Line', informative_text = 'Line:', text = ''}
-      buffer.goto_line(buffer,line)
+      buffer.goto_line(buffer,line - 1)
     end
 }
 
+keys['cs'] = function()
+  ui.find.find_incremental(nil, true)
+end
+keys['cr'] = function()
+  ui.find.find_incremental(nil, false)
+end
+
 keys['cx'] = {
+    ['k'] = io.close_buffer,
     ['cc'] = quit,
     ['cs'] = function()
       io.save_file()
@@ -55,15 +74,34 @@ keys['cx'] = {
     end,
     ['cf'] = io.open_file,
     ['2'] = function()
+      current_view = view
       view.split(view, false)
+      ui.goto_view(current_view)
       hide_ui_elements()
     end,
     ['3'] = function()
+      current_view = view
       view.split(view, true)
+      ui.goto_view(current_view)
       hide_ui_elements()
     end,
     ['o'] = function() ui.goto_view(1) end,
     ['b'] = ui.switch_buffer,
+    ['0'] = function()
+      unsplit_view = nil
+      for i = 1, #_VIEWS do
+        if not (_VIEWS[i] == _G.view) then
+          unsplit_view = _VIEWS[i]
+          break
+        end
+      end
+      if unsplit_view then
+        unsplit_view.unsplit(unsplit_view)
+      end
+    end,
+    ['1'] = function()
+      view.unsplit(view)
+    end,
 }
 keys['a<'] = buffer.document_start
 keys['a>'] = buffer.document_end
@@ -87,5 +125,4 @@ keys['af'] = buffer.word_right
 keys['ab'] = buffer.word_left
 keys['av'] = buffer.page_up
 keys['ad'] = buffer.del_word_right
-keys['ax'] = function() ui.command_entry.enter_mode('lua_command') end
-
+keys['a:'] = function() ui.command_entry.enter_mode('lua_command') end
