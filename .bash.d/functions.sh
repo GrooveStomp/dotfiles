@@ -25,6 +25,7 @@ function list-functions() {
     echo "mysql-db"
     echo "rmq-publish"
     echo "mogo-update-soa-docs"
+    echo "network-admin"
 }
 
 function autorun-aaron() {
@@ -404,25 +405,15 @@ function docker-refresh-db() {
 
     if [[ $(has_help_flag $args) ]]; then
         echo "Usage: ${name}"
-        echo "options:"
-        echo -e "\t--branch: which branch to use. Defaults to \`dev'"
+        echo "Drops db containers and images then creates them anew."
         return
     fi
 
-    local branch="dev"
-    if [[ $(has_arg $args "--branch") ]]; then
-        branch=$(get_arg_after $args "--branch")
-    fi
-
-    docker-compose kill
-    docker rm ${branch}_mysqlschema_1 > /dev/null 2>&1
-    docker rm ${branch}_mysql_1 > /dev/null 2>&1
-
-    IMAGES=$(docker images | grep schema | grep $branch | awk '{print $3}')
-    for IMG in "${IMAGES[@]}"; do
-        docker rmi -f $IMG > /dev/null 2>&1
-    done
-    docker-compose $args up -d
+    local MYSQL_IMAGEID=$(docker images | grep -P '^mysql\s+' | awk '{print $3}')
+    docker rm dev_mysqlschema_1 -f
+    docker rm dev_mysql_1 -f
+    docker rmi $MYSQL_IMAGEID -f
+    docker-compose up -d
 }
 
 function docker-prune-images() {
@@ -647,6 +638,100 @@ function display-configure() {
     local configure_for_work=$(has_arg $args "--work")
     if [ ! -z "$configure_for_work" ]; then
         xrandr --output eDP1 --off # Laptop monitor.
-        xrandr --output DP1 --mode 3840x2160 # 4k work monitor.
+        xrandr --output DP1 --mode 3840x2160 --dpi 163 # 4k work monitor.
     fi
+}
+
+function network-admin() {
+    case "$1" in
+
+        # Start Mogo VPN and other work:
+        #-----------------------------------------------------------------------
+        mogo)
+            case "$2" in
+                start)
+                    sudo systemctl stop pia
+                    sudo systemctl stop dnscrypt-proxy.socket
+                    sudo systemctl stop dnscrypt-proxy.service
+                    sudo chattr -i /etc/resolv.conf
+                    sudo chmod o+w /etc/resolv.conf
+                    sudo echo "domain MOGO.LAN" > /etc/resolv.conf
+                    sudo echo "nameserver 10.32.102.10" >> /etc/resolv.conf
+                    sudo echo "nameserver 10.32.104.10" >> /etc/resolv.conf
+                    sudo chmod o-w /etc/resolv.conf
+                    sudo chattr +i /etc/resolv.conf
+                    ;;
+                stop)
+                    network-admin default
+                    ;;
+            esac
+            ;;
+
+        # Start DNS Encryption:
+        #-----------------------------------------------------------------------
+        dnscrypt)
+            case "$2" in
+                start)
+                    sudo systemctl stop pia
+                    sudo systemctl stop dnscrypt-proxy.socket
+                    sudo systemctl stop dnscrypt-proxy.service
+                    sudo chattr -i /etc/resolv.conf
+                    sudo chmod o+w /etc/resolv.conf
+                    sudo echo "nameserver 127.0.0.1" > /etc/resolv.conf
+                    sudo chmod o-w /etc/resolv.conf
+                    sudo chattr +i /etc/resolv.conf
+                    sudo systemctl start dnscrypt-proxy.socket
+                    sudo systemctl start dnscrypt-proxy.service
+                    ;;
+                stop)
+                    network-admin default
+                    ;;
+            esac
+            ;;
+
+        # Start and Stop PIA personal VPN
+        #-----------------------------------------------------------------------
+        pia)
+            case "$2" in
+                start)
+                    sudo systemctl start pia
+                ;;
+                stop)
+                    sudo systemctl stop pia
+                ;;
+            esac
+        ;;
+
+        # Default DNS configuration in case there are problems.
+        #-----------------------------------------------------------------------
+        default)
+            sudo systemctl stop pia
+            sudo systemctl stop dnscrypt-proxy.socket
+            sudo systemctl stop dnscrypt-proxy.service
+            sudo chattr -i /etc/resolv.conf
+            sudo chmod o+w /etc/resolv.conf
+            # OpenDNS Family Shield defaults
+            sudo echo "nameserver 208.67.222.222" > /etc/resolv.conf
+            sudo echo "nameserver 208.67.220.220" >> /etc/resolv.conf
+            sudo chmod o-w /etc/resolv.conf
+            sudo chattr +i /etc/resolv.conf
+            ;;
+        help)
+            echo "Usage: ${FUNCNAME[0]} subcommand [start|stop]"
+            echo
+            echo "subcommands:"
+            echo "- mogo"
+            echo "- dnscrypt"
+            echo "- pia"
+            echo "- default"
+            echo "- help"
+            echo
+            echo "NOTE: \`default' doesn't accept \`start' or \`stop'"
+            ;;
+        *)
+            network-admin help
+            ;;
+    esac
+
+
 }
