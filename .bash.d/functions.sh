@@ -716,6 +716,25 @@ function network-admin() {
             sudo chmod o-w /etc/resolv.conf
             sudo chattr +i /etc/resolv.conf
             ;;
+
+        # Show status of pia and dnscrypt-proxy services.
+        #-----------------------------------------------------------------------
+        status)
+            echo "pia status "
+            echo "--------------------------------------------------------------------------------"
+            curl -s https://www.privateinternetaccess.com | grep -P 'You are (not )?protected'
+            echo
+            sudo systemctl status pia | cat | grep Active
+            echo
+            echo "dnscrypt-proxy status "
+            echo "--------------------------------------------------------------------------------"
+            sudo systemctl status dnscrypt-proxy | cat | grep Active
+            echo
+            echo "/etc/resolv.conf"
+            echo "--------------------------------------------------------------------------------"
+            cat /etc/resolv.conf
+            ;;
+
         help)
             echo "Usage: ${FUNCNAME[0]} subcommand [start|stop]"
             echo
@@ -725,6 +744,7 @@ function network-admin() {
             echo "- pia"
             echo "- default"
             echo "- help"
+            echo "- status"
             echo
             echo "NOTE: \`default' doesn't accept \`start' or \`stop'"
             ;;
@@ -732,6 +752,4 @@ function network-admin() {
             network-admin help
             ;;
     esac
-
-
 }
