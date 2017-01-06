@@ -733,6 +733,12 @@ function network-admin() {
             echo "/etc/resolv.conf"
             echo "--------------------------------------------------------------------------------"
             cat /etc/resolv.conf
+
+            # Get dnscrypt-proxy IP address:
+            # systemctl status dnscrypt-proxy | cat | sed -rn 's|.*Proxying from 127.0.0.1:53 to (.+)|\1|p'
+            # Then use wireshark cli (tshark) to inspect traffic to this ip.
+            #   (Not sure how to do this properly yet.)
+            #   tshark dst net 77.66.84.233 doesn't capture anything.
             ;;
 
         help)
