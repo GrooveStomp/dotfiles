@@ -653,6 +653,7 @@ function network-admin() {
                     sudo systemctl stop pia
                     sudo systemctl stop dnscrypt-proxy.socket
                     sudo systemctl stop dnscrypt-proxy.service
+                    sudo systemctl stop dnsmasq.service
                     sudo chattr -i /etc/resolv.conf
                     sudo chmod o+w /etc/resolv.conf
                     sudo echo "domain MOGO.LAN" > /etc/resolv.conf
@@ -662,7 +663,7 @@ function network-admin() {
                     sudo chattr +i /etc/resolv.conf
                     ;;
                 stop)
-                    network-admin default
+                    network-admin default start
                     ;;
             esac
             ;;
@@ -675,6 +676,7 @@ function network-admin() {
                     sudo systemctl stop pia
                     sudo systemctl stop dnscrypt-proxy.socket
                     sudo systemctl stop dnscrypt-proxy.service
+                    sudo systemctl stop dnsmasq.service
                     sudo chattr -i /etc/resolv.conf
                     sudo chmod o+w /etc/resolv.conf
                     sudo echo "nameserver 127.0.0.1" > /etc/resolv.conf
@@ -682,9 +684,10 @@ function network-admin() {
                     sudo chattr +i /etc/resolv.conf
                     sudo systemctl start dnscrypt-proxy.socket
                     sudo systemctl start dnscrypt-proxy.service
+                    sudo systemctl start dnsmasq.service
                     ;;
                 stop)
-                    network-admin default
+                    network-admin default start
                     ;;
             esac
             ;;
@@ -695,26 +698,34 @@ function network-admin() {
             case "$2" in
                 start)
                     sudo systemctl start pia
-                ;;
+                    ;;
                 stop)
                     sudo systemctl stop pia
-                ;;
+                    ;;
             esac
-        ;;
+            ;;
 
         # Default DNS configuration in case there are problems.
         #-----------------------------------------------------------------------
         default)
-            sudo systemctl stop pia
-            sudo systemctl stop dnscrypt-proxy.socket
-            sudo systemctl stop dnscrypt-proxy.service
-            sudo chattr -i /etc/resolv.conf
-            sudo chmod o+w /etc/resolv.conf
-            # OpenDNS Family Shield defaults
-            sudo echo "nameserver 208.67.222.222" > /etc/resolv.conf
-            sudo echo "nameserver 208.67.220.220" >> /etc/resolv.conf
-            sudo chmod o-w /etc/resolv.conf
-            sudo chattr +i /etc/resolv.conf
+            case "$2" in
+                start)
+                    sudo systemctl stop pia
+                    sudo systemctl stop dnscrypt-proxy.socket
+                    sudo systemctl stop dnscrypt-proxy.service
+                    sudo systemctl stop dnsmasq.service
+                    sudo chattr -i /etc/resolv.conf
+                    sudo chmod o+w /etc/resolv.conf
+                    # OpenDNS Family Shield defaults
+                    sudo echo "nameserver 208.67.222.222" > /etc/resolv.conf
+                    sudo echo "nameserver 208.67.220.220" >> /etc/resolv.conf
+                    sudo chmod o-w /etc/resolv.conf
+                    sudo chattr +i /etc/resolv.conf
+                    ;;
+                stop)
+                    sudo systemctl stop pia
+                    ;;
+            esac
             ;;
 
         # Show status of pia and dnscrypt-proxy services.
@@ -729,6 +740,10 @@ function network-admin() {
             echo "dnscrypt-proxy status "
             echo "--------------------------------------------------------------------------------"
             sudo systemctl status dnscrypt-proxy | cat | grep Active
+            echo
+            echo "dnsmasq status "
+            echo "--------------------------------------------------------------------------------"
+            sudo systemctl status dnsmasq | cat | grep Active
             echo
             echo "/etc/resolv.conf"
             echo "--------------------------------------------------------------------------------"
