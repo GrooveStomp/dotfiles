@@ -129,18 +129,32 @@
 ;;; Org-Mode
 ;;;
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
-(add-hook 'org-mode-hook 'turn-on-font-lock) ; Not needed when global-font-lock-mode is on?
+;;(add-hook 'org-mode-hook 'turn-on-font-lock) ; Not needed when global-font-lock-mode is on?
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 (setq org-log-done 'time)
 (setq org-todo-keywords
-      '((sequence "TODO" "STARTED" "WAITING" "DONE" "CANCELLED" "DEFERRED")))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(setq org-agenda-files (quote ("~/notes")))
-
+      '((sequence "TODO" "STARTED" "WAITING" "DEFERRED" "|" "DONE" "CANCELLED")))
+;;(setq org-log-done t)
+(setq org-ellipsis " ▼")
+(setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
+(setq org-src-window-setup 'current-window)
+(load-library "find-lisp")
+;; Get initial list of agenda files.
+(setq aaron-agenda-files (find-lisp-find-files "~/notes" "\.org$"))
+;; Filter out syncthing backed-up files.
+(setq aaron-agenda-files
+      (remove-if (lambda (path)
+                   (string-match "\.stversions" path))
+                 aaron-agenda-files))
+;; DEBUG: Show value of aaron-agenda-files
+;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
+(setq org-agenda-files aaron-agenda-files)
+(add-hook 'org-mode-hook
+          (lambda () (progn (org-bullets-mode -1)
+                            (org-indent-mode 1))))
 
 (global-set-key (kbd "C-o")     'open-next-line)
 (global-set-key (kbd "M-o")     'open-previous-line)
@@ -189,13 +203,3 @@
 ;; Go-mode
 (add-hook 'go-mode-hook
           (add-hook 'before-save-hook 'gofmt-before-save))
-
-
-;; Org-mode
-(add-hook 'org-mode-hook
-          (lambda () (progn (org-bullets-mode -1)
-                            (org-indent-mode 1))))
-(setq org-ellipsis " ▼")
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
-(setq org-src-window-setup 'current-window)
