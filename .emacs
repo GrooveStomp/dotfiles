@@ -1,8 +1,40 @@
+(defvar *emacs-load-start* (current-time))
 (require 'cl)
 
-(dolist (key '("\C-h\C-n" ;; Disable shortcut to Emacs news.
-               "\C-hn"))  ;; Disable shortcut to Emacs news.
-  (global-unset-key key))
+;;------------------------------------------------------------------------------
+;; Auto-install package dependencies
+;;------------------------------------------------------------------------------
+(setq package-list
+      '(dirtree
+        go-mode
+        gruvbox-theme
+        highlight-parentheses
+        multi-term
+        org-bullets
+        paredit
+        tramp
+        tree-mode
+        windata))
+
+(setq package-archives
+      '(("elpa" . "http://tromey.com/elpa/")
+        ("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.milkbox.net/packages/")))
+
+(package-initialize)
+
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(dolist (package package-list)
+   (unless (package-installed-p package)
+     (package-install package)))
+
+;;------------------------------------------------------------------------------
+;; Configuration
+;;------------------------------------------------------------------------------
+(global-unset-key "\C-h\C-n") ; Disable shortcut to Emacs news.
+(global-unset-key "\C-hn")    ; Disable shortcut to Emacs news.
 
 (setq-default fill-column 80)
 (setq initial-major-mode 'org-mode)
@@ -10,23 +42,13 @@
 # Scratch buffer, text-mode..
 # Remember, you are awesome. Stick with it!")
 
-;; ELPA Package manager setup.
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-
-;; Global vars.
-(defvar *emacs-load-start* (current-time))
-
-;; Always follow symlinks.
-(setq vc-follow-symlinks t)
-;; General Emacs settings.
-(set-default 'truncate-lines t)
-(setq-default indent-tabs-mode nil
-              tab-width 2)
-(setq inhibit-startup-screen t ; Disable splash screen.
-      column-number-mode t ; Show column numbers
-      indent-line-function 'insert-tab)
+(set 'vc-follow-symlinks t)             ; Follow symlinks when opening files
+(set-default 'truncate-lines t)         ; Truncate lines wider than display
+(set-default 'indent-tabs-mode nil)
+(set-default 'tab-width 2)              ; 2-space tabs
+(set 'inhibit-startup-screen t)         ; Disable splash screen.
+(set 'column-number-mode t)             ; Show column numbers
+(set 'indent-line-function 'insert-tab)
 
 ;; Case-sensitive query-replace.
 (defadvice replace-string (around turn-off-case-fold-search)
@@ -34,46 +56,45 @@
     ad-do-it))
 
 (ad-activate 'replace-string)
-
-;; GUI Options.
-(global-font-lock-mode 1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-
 (transient-mark-mode t)
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
-;(remove-hook 'before-save-hook 'delete-trailing-whitespace)
 
-;; Set file backup scheme.
-(setq backup-by-copying t
-      backup-directory-alist '(("." . "~/.emacs-saves"))
-      delete-old-versions t
-      kept-new-versions 6
-      kept-old-versions 2
-      version-control t
-      ;; Make normal search work like dired-isearch-filenames when in dired.
-      dired-isearch-filenames t
-      inferior-lisp-program "/usr/bin/sbcl")
+;;------------------------------------------------------------------------------
+;; User interface
+;;------------------------------------------------------------------------------
+(load-theme 'gruvbox-dark-soft t)
+(set-face-attribute 'default nil :font "Liberation Mono 12")
+(global-font-lock-mode 1) ; Enable syntax highlighting
+(menu-bar-mode -1)        ; Disable the menubar
+(scroll-bar-mode -1)      ; Disable the scrollbar
+(tool-bar-mode -1)        ; Disable the toolbar
 
-;; Dependencies.
+;;------------------------------------------------------------------------------
+;; Backups
+;;------------------------------------------------------------------------------
+(set 'backup-by-copying t)
+(set 'backup-directory-alist '(("." . "~/.emacs-saves")))
+(set 'delete-old-versions t)
+(set 'kept-new-versions 6)
+(set 'kept-old-versions 2)
+(set 'version-control t)
+
+(set 'dired-isearch-filenames t) ; Make normal search work like dired-isearch-filenames when in dired.
+
+;;------------------------------------------------------------------------------
+
 (require 'paredit)
-;(require 'highlight-parentheses)
+(require 'highlight-parentheses)
 (require 'tree-mode)
 (require 'windata)
 (require 'multi-term)
 (require 'tramp)
 (require 'dirtree)
-;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
 ; Set the tramp remote connection default type.
 (setq tramp-default-method "sshx")
-
-; Enable auto-complete.
-;(ac-exuberant-ctags-setup)
-(setq multi-term-program "/bin/bash")
-;(auto-complete-mode)
+(setq multi-term-program (getenv "SHELL"))
 
 (defun .add-to-lisp-mode (file-ext)
   (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
@@ -91,19 +112,16 @@
    (quote
     (org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit))))
 
-;; Custom functions.
-(load-library "~/.emacs.d/support.el")
-; (load-library "lisp-config.el")
-
-(windmove-default-keybindings)
-
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+;; Custom functions.
+(load-library "~/.emacs.d/support.el")
+(windmove-default-keybindings)
 
 ; Bright-red TODOs
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode ruby-mode))
@@ -125,37 +143,9 @@
 (modify-face 'font-lock-important-face "Yellow" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
 
-;;;
-;;; Org-Mode
-;;;
-(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
-;;(add-hook 'org-mode-hook 'turn-on-font-lock) ; Not needed when global-font-lock-mode is on?
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(setq org-log-done 'time)
-(setq org-todo-keywords
-      '((sequence "TODO" "STARTED" "WAITING" "DEFERRED" "|" "DONE" "CANCELLED")))
-;;(setq org-log-done t)
-(setq org-ellipsis " ▼")
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
-(setq org-src-window-setup 'current-window)
-(load-library "find-lisp")
-;; Get initial list of agenda files.
-(setq aaron-agenda-files (find-lisp-find-files "~/notes" "\.org$"))
-;; Filter out syncthing backed-up files.
-(setq aaron-agenda-files
-      (remove-if (lambda (path)
-                   (string-match "\.stversions" path))
-                 aaron-agenda-files))
-;; DEBUG: Show value of aaron-agenda-files
-;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
-(setq org-agenda-files aaron-agenda-files)
-(add-hook 'org-mode-hook
-          (lambda () (progn (org-bullets-mode -1)
-                            (org-indent-mode 1))))
-
+;;------------------------------------------------------------------------------
+;; Keybindings
+;;------------------------------------------------------------------------------
 (global-set-key (kbd "C-o")     'open-next-line)
 (global-set-key (kbd "M-o")     'open-previous-line)
 (global-set-key (kbd "RET")     'newline-and-indent)
@@ -167,30 +157,59 @@
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
 
-(setq c-default-style "linux")
+;;------------------------------------------------------------------------------
+;; Major mode hooks
+;;------------------------------------------------------------------------------
+;; Go
+(add-hook 'go-mode-hook
+          (add-hook 'before-save-hook 'gofmt-before-save))
+
+;; C
 (add-hook 'c-mode-common-hook
           (lambda ()
+            (setq c-default-style "linux")
             (setq tab-width 8)
             (setq c-basic-offset 8)
             ;; Make `case' statements in `switch' blocks indent normally.
             (c-set-offset 'case-label '+)))
 
-(add-hook 'sh-mode-common-hook
+;; Shell
+(add-hook 'sh-mode-commong-hook
           (lambda ()
             (setq tab-width 8)
             (setq c-basic-offset 8)
             ;; Make `case' statements in `switch' blocks indent normally.
             (c-set-offset 'case-label '+)))
 
-;; Color Themes
-;; https://github.com/owainlewis/emacs-color-themes
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/elpa/sublime-themes-20160111.122/")
-(if (display-graphic-p)
-    (load-theme 'mellow t)
-  (load-theme 'labburn t))
-(set-face-attribute 'default nil :font "Liberation Mono 12")
+;; Org Mode
+(add-hook 'org-mode-hook
+          (lambda ()
+            (org-bullets-mode -1)
+            (org-indent-mode 1)
+            (local-set-key "\C-cl" 'org-store-link)
+            (local-set-key "\C-ca" 'org-agenda)
+            (local-set-key "\C-cb" 'org-iswitchb)
+            (setq org-log-done 'time)
+            (setq org-todo-keywords
+                  '((sequence "TODO" "STARTED" "WAITING" "DEFERRED" "|" "DONE" "CANCELLED")))
+            (setq org-ellipsis " ▼")
+            (setq org-src-fontify-natively t)
+            (setq org-src-tab-acts-natively t)
+            (setq org-src-window-setup 'current-window)
+            (load-library "find-lisp")
+            ;; Get initial list of agenda files
+            (setq aaron-agenda-files
+                  (find-lisp-find-files "~/notes/work/" "\.org$"))
+            ;; Filter out syncthing backup files.
+            (setq aaron-agenda-files
+                  (remove-if (lambda (path)
+                               (string-match "\.stversions" path))
+                             aaron-agenda-files))
+            (setq org-agenda-files aaron-agenda-files)))
 
+;;------------------------------------------------------------------------------
 ;; Finish calculating total load time for .emacs.
+;;------------------------------------------------------------------------------
 (defvar *finish-time* (current-time))
 (message "My .emacs loaded in %ds"
          (let (finish-time (current-time))
@@ -199,7 +218,3 @@
               (+ (first *emacs-load-start*)
                  (second *emacs-load-start*)))))
 (put 'narrow-to-region 'disabled nil)
-
-;; Go-mode
-(add-hook 'go-mode-hook
-          (add-hook 'before-save-hook 'gofmt-before-save))
