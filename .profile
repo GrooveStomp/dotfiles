@@ -1,28 +1,45 @@
+#-------------------------------------------------------------------------------
+#   _               _                        __ _ _
+#  | |__   __ _ ___| |__    _ __  _ __ ___  / _(_) | ___
+#  | '_ \ / _` / __| '_ \  | '_ \| '__/ _ \| |_| | |/ _ \
+#  | |_) | (_| \__ \ | | | | |_) | | | (_) |  _| | |  __/
+#  |_.__/ \__,_|___/_| |_| | .__/|_|  \___/|_| |_|_|\___|
+#                          |_|
+#
+#-------------------------------------------------------------------------------
 # ~/.profile: executed by the command interpreter for login shells.
 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
 # exists.
 # see /usr/share/doc/bash/examples/startup-files for examples.
 # the files are located in the bash-doc package.
 
-# the default umask is set in /etc/profile; for setting the umask
-# for ssh logins, install and configure the libpam-umask package.
-#umask 022
+#-------------------------------------------------------------------------------
+# Env vars and path
+#-------------------------------------------------------------------------------
+export EDITOR="emacs -nw"
+export SSH_ENV="$HOME/.ssh/env"
+export GOPATH="$HOME/code/go"
+export PATH="$HOME/bin:$PATH"
+
+[ -d "/snap/bin" ] && export PATH="/snap/bin:$PATH"
+[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
+[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
+[ -f "$HOME/bash.d/local-env-vars.sh" ] && . "$HOME/.bash.d/local-env-vars.sh"
+
+#-------------------------------------------------------------------------------
+# Aliases
+#-------------------------------------------------------------------------------
+alias bc="bc -l"
+alias rm="rm -i"
+alias vim="emacs -nw -q"
+alias vi="emacs -nw -q"
+alias grep="grep --line-buffered"
+alias dirs="dirs -v"
+
 
 # if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	      . "$HOME/.bashrc"
-    fi
+if [ $(basename $SHELL) == "bash" ]; then
+	  . "$HOME/.bashrc"
 fi
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-
-export EDITOR=emacs
-export GOPATH=~/code/go
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+export PATH="$HOME/.cargo/bin:$PATH"

@@ -1,80 +1,65 @@
-. $HOME/.bash.d/ubuntu_defaults.sh
+#-----------------------------------------------------------------------------
+#   _               _
+#  | |__   __ _ ___| |__    _ __ ___
+#  | '_ \ / _` / __| '_ \  | '__/ __|
+#  | |_) | (_| \__ \ | | | | | | (__
+#  |_.__/ \__,_|___/_| |_| |_|  \___|
+#
+#-----------------------------------------------------------------------------
 . $HOME/.bash.d/git-prompt.sh
-. $HOME/.bash.d/aliases.sh
-. $HOME/.bash.d/chruby.sh
-. $HOME/.bash.d/emacs.sh
-. $HOME/.bash.d/functions.sh
 
-term_bg_file=${HOME}/.backup/.termbg
-
-# if [ $(cat ${term_bg_file}) == "light" ]; then
-#   colorscheme solarized-light
-# else
-#   colorscheme solarized-dark
-# fi
+if ! shopt -oq posix; then
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
+fi
 
 #-----------------------------------------------------------------------------
-# Setup bash colors.
+# Bash Colors (9):
+# a: black,   b: red,  c: green,      d: brown,  e: blue,
+# f: magenta, g: cyan, h: light gray, x: default
 #
-# Colors:           Order:
-# a = black         DIR
-# b = red           SYM_LINK
-# c = green         SOCKET
-# d = brown         PIPE
-# e = blue          EXE
-# f = magenta       BLOCK_SP
-# g = cyan          CHAR_SP
-# h = light gray    EXE_SUID
-# x = default       EXE_GUID
-#                   DIR_STICKY
-#                   DIR_WO_STICKY
+# Order (11):
+# DIR, SYM_LINK, SOCKET, PIPE, EXE, BLOCK_SP, CHAR_SP, EXE_SUID, EXE_GUID,
+# DIR_STICKY, DIR_WO_STICKY
 #
+# Format String (11): (Xx)
 # export LSCOLORS="XxXxXxXxXxXxXxXxXxXxXx"
 #
 export LSCOLORS="GxGxxxxxCxxxxxxxxxxxxx"
 export LSOPTIONS="--color=auto"
 export CLICOLOR="Yes"
 
-function neutral_color() {
-  local black='\[\e[0;30m\]'
-  local reset='\[\e[0m\]'
-
-  if [ $(cat ${term_bg_file}) == "dark" ]; then
-    echo $reset
-  else
-    echo $black
-  fi
-}
-
 function git_string() {
-  local neutral=$(neutral_color)
-  local blue='\[\e[0;34m\]'
+    local blue='\[\e[0;34m\]'
 
-  local separator="${neutral}|"
-
-  if [ $(__git_ps1 %s) ]; then
-    echo "${separator}${blue}git:$(__git_ps1 %s)${separator}"
-  else
-    echo "${separator}"
-  fi
+    if [ $(__git_ps1 %s) ]; then
+        echo "${blue}git:$(__git_ps1 %s)"
+    else
+        echo ""
+    fi
 }
 
 function compose_prompt() {
-  local neutral=$(neutral_color)
-  local red='\[\e[0;31m\]'
-  local green='\[\e[0;32m\]'
-  local purple='\[\e[0;35m\]'
+    local fg_light_theme='\[\e[0;30m\]'
+    local fg_dark_theme='\[\e[0m\]'
 
-  local open="${neutral}["
-  local close="${neutral}]"
-  local separator="${neutral}|"
+    local neutral=$fg_dark_theme
+    local red='\[\e[0;31m\]'
+    local green='\[\e[0;32m\]'
+    local purple='\[\e[0;35m\]'
 
-  local machine="${purple}\u@\h"
-  local path="${green}\w"
-  local ruby="${red}$(ruby -v | awk '{print $1, $2}')"
-  local git=$(git_string)
+    local open="${neutral}["
+    local close="${neutral}]"
+    local separator="${neutral}|"
 
-  PS1="${open}${machine}${separator}${path}${git}${ruby}${close}\n↳ "
+    local machine="${purple}\u@\h"
+    local path="${green}\w"
+    local git=$(git_string)
+
+    PS1="${open}${machine}${separator}${path}${separator}${git}${close}\n↳ "
 }
 
 PROMPT_COMMAND=compose_prompt
