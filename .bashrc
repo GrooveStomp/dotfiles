@@ -98,7 +98,7 @@ function compose_prompt() {
   if [ ! -z "$git_string" ]; then
     git_string="${blue}${git_string}"
   fi
-    
+
   local red='\[\e[0;31m\]'
   local green='\[\e[0;32m\]'
   local purple='\[\e[0;35m\]'
