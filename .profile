@@ -54,3 +54,5 @@ export EDITOR="emacs -nw"
 #-------------------------------------------------------------------------------
 # eg.,: .profile-linux, .profile-darwin
 . $HOME/.profile-$(uname | tr '[:upper:]' '[:lower:]')
+
+. $HOME/.bashrc
