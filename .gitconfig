@@ -1,21 +1,10 @@
 [user]
 	name = Aaron Oman
-	email = aaron.oman@mogo.ca
-[achievement]
-	upload = true
 [color]
 	ui = auto
 [diff]
 	renames = copies
-[core]
-	whitespace = nowarn
 [alias]
 	plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [merge]
 	conflictstyle = diff3
-
-
-# Bullshit for Go.
-# See: https://golang.org/doc/faq#git_https
-[url "git@github.com:"]
-	insteadOf = https://github.com/

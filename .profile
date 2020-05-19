@@ -27,27 +27,8 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-# Env vars and PATH
-#-------------------------------------------------------------------------------
-export EDITOR="emacs -nw"
-export SSH_ENV="$HOME/.ssh/env"
-export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$PATH"
-
-[ -d "$HOME/bin" ]     && export PATH="$HOME/bin:$PATH"
-[ -d "/usr/local/go" ] && export PATH="/usr/local/go/bin:$PATH"
-[ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
-[ -f "$HOME/.bash.d/local-env-vars.sh" ] && . "$HOME/.bash.d/local-env-vars.sh"
-[ -d "/usr/local/opt/llvm/bin" ] && export PATH="/usr/local/opt/llvm/bin:$PATH"
-
-#-------------------------------------------------------------------------------
 # Aliases
 #-------------------------------------------------------------------------------
-alias ls='ls -1'
-alias lld='ls -Alhd'
-alias ll='ls -Alh'
-alias la='ls -A'
-alias l='ls -CF'
 alias rm='rm -i'
 alias bc='bc -l'
 
@@ -58,9 +39,18 @@ alias vim="emacs -nw -q"
 alias grep='grep --line-buffered'
 alias dirs='dirs -v'
 
-. ~/code/dotfiles/.profile-$(uname | tr '[:upper:]' '[:lower:]')
+#-------------------------------------------------------------------------------
+# Env vars and PATH
+#-------------------------------------------------------------------------------
+export EDITOR="emacs -nw"
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
+[ -d "$HOME/go" ] && export GOPATH="$HOME/go"
+[ -d "$GOPATH/bin" ] && export PATH="$GOPATH/bin:$PATH"
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+[ -f "$HOME/.local/env" ] && . $HOME/.local/env
+
+#-------------------------------------------------------------------------------
+# OS-specific configuration
+#-------------------------------------------------------------------------------
+# eg.,: .profile-linux, .profile-darwin
+. $HOME/.profile-$(uname | tr '[:upper:]' '[:lower:]')
