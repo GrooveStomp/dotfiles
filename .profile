@@ -43,6 +43,7 @@ alias dirs='dirs -v'
 # Env vars and PATH
 #-------------------------------------------------------------------------------
 export EDITOR="emacs -nw"
+export SSH_ENV="$HOME/.ssh/env"
 
 [ -d "$HOME/go" ] && export GOPATH="$HOME/go"
 [ -d "$GOPATH/bin" ] && export PATH="$GOPATH/bin:$PATH"

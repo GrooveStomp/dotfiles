@@ -8,59 +8,20 @@
 #-------------------------------------------------------------------------------
 # Banner text generated with figlet.
 #
-
-function ssh_agent_start() {
-    echo "Initializing new SSH agent..."
-    local readonly SSH_AGENT=$(which ssh-agent)
-    $SSH_AGENT | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    echo succeeded
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    local readonly SSH_ADD=$(which ssh-add)
-    $SSH_ADD
-}
-
-function ssh_agent_without_keychain() {
-    # Source ssh settings, if applicable.
-    if [ -f "${SSH_ENV}" ]; then
-        . "${SSH_ENV}" > /dev/null
-        ps -ef | grep ${SSH_AGENT_PID} | grep [s]sh-agent$ > /dev/null || {
-            ssh_agent_start
-        }
-    else
-        ssh_agent_start
-    fi
-}
-
-function ssh_agent_with_keychain() {
-    local readonly KEYCHAIN=$(which keychain)
-    eval `$KEYCHAIN --eval --agents ssh -Q --quiet id_rsa`
-}
-
-GIT_PROMPT="$HOME/.bash.d/git-prompt.sh"
-GIT_COMPLETION="$HOME/.bash.d/git-completion.bash"
-if [ "$(uname -s)" = "Darwin" ]; then
-    MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh"
-    [ -f "$MYDIR" ] && GIT_PROMPT="$MYDIR"
-
-    MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash"
-    [ -f "$MYDIR" ] && GIT_COMPLETION="$MYDIR"
-
-    ssh_agent_without_keychain
-# elif [ "$(uname -s)" = "Linux" ]; then
-#     MYDIR="..."
-#     [ -f "$MYDIR" ] && GIT_PROMPT="$MYDIR"
+# ~/.bash_profile
+#        The personal initialization file, executed for login shells
+# ~/.bashrc
+#        The individual per-interactive-shell startup file
+# ~/.bash_logout
+#        The individual login shell cleanup file, executed when a login shell exits
+# ~/.inputrc
+#        Individual readline initialization file
 #
-#     MYDIR="..."
-#     [ -f "$MYDIR" ] && GIT_COMPLETION="$MYDIR"
-#     if [ -z "$(which keychain)" ]; then
-#         ssh_agent_without_keychain
-#     else
-#         ssh_agent_with_keychain
-#     fi
-fi
-. $GIT_PROMPT
-. $GIT_COMPLETION
+# This file can contain bash-specific configuration.
+#-------------------------------------------------------------------------------
+
+# OS-specific bash configuration
+. $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')
 
 if [ -f "/usr/local/share/chruby/chruby.sh" ]; then
     . /usr/local/share/chruby/chruby.sh
@@ -71,20 +32,22 @@ fi
 #-----------------------------------------------------------------------------
 # Setup bash colors.
 #
-# Colors:         ;  Order:
-# a = black         DIR
-# b = red           SYM_LINK
-# c = green         SOCKET
-# d = brown         PIPE
-# e = blue          EXE
-# f = magenta       BLOCK_SP
-# g = cyan          CHAR_SP
-# h = light gray    EXE_SUID
-# x = default       EXE_GUID
-#                   DIR_STICKY
-#                   DIR_WO_STICKY
-#
 # export LSCOLORS="XxXxXxXxXxXxXxXxXxXxXx"
+#                  | | | | | | | | | | └ dir w/o sticky
+#                  | | | | | | | | | └ dir sticky
+#                  | | | | | | | | └ exe guid
+#                  | | | | | | | └ exe suid
+#                  | | | | | | └ char sp
+#                  | | | | | └ block sp
+#                  | | | | └ exe
+#                  | | | └ pipe
+#                  | | └ socket
+#                  | └ sym link
+#                  └ dir
+#
+# Colors:
+# a = black,   b = red,  c = green,      d = brown,  e = blue
+# f = magenta, g = cyan, h = light gray, x = default
 #
 export LSCOLORS="GxGxxxxxCxxxxxxxxxxxxx"
 export LSOPTIONS="--color=auto"
