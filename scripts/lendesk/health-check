@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-
-curl -s https://api.lendesk.com/_hc/all.json | \
-    jq '.[] | .success' | \
-    awk '$1 == "false" { false += 1 } END { print (false > 0) ? "Error" : "All systems go" }'

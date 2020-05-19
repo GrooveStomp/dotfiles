@@ -1,2 +1,0 @@
-#!/usr/bin/env sh
-free -m | awk 'FNR == 2 { printf "%.0f%", ($4/$2)*100 }'
