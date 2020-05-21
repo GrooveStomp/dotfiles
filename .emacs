@@ -185,7 +185,6 @@
 
 ;; Custom functions.
 (load-library "~/.emacs.d/support.el")
-(load-library "~/.emacs.d/odin-mode.el")
 
 (windmove-default-keybindings)
 
@@ -230,9 +229,7 @@
 (global-set-key (kbd "M-Q")     'unfill-paragraph)
 
 ;; Enable/Disable font-lock. (Syntax highlighting.)
-(if (use-theme-p)
-    (global-font-lock-mode 1)
-  (global-font-lock-mode -1))
+(global-font-lock-mode 1)
 
 ;; Color Themes
 ;; https://github.com/owainlewis/emacs-color-themes

@@ -19,6 +19,12 @@
 #
 # This file can contain bash-specific configuration.
 #-------------------------------------------------------------------------------
+function start_ssh_agent {
+    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    ssh-add
+}
 
 # OS-specific bash configuration
 . $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')

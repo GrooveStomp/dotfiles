@@ -1,17 +1,16 @@
+#!/bin/sh
+
 MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh"
-[ -f "$MYDIR" ] && GIT_PROMPT="$MYDIR"
+[ -f "$MYDIR" ] && . "$MYDIR"
 
 MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash"
-[ -f "$MYDIR" ] && GIT_COMPLETION="$MYDIR"
+[ -f "$MYDIR" ] && . "$MYDIR"
 
 if [ -f "${SSH_ENV}" ]; then
     . "${SSH_ENV}" > /dev/null
     ps -ef | grep ${SSH_AGENT_PID} | grep [s]sh-agent$ > /dev/null || {
-        ssh_agent_start
+        start_ssh_agent
     }
 else
-    ssh_agent_start
+    start_ssh_agent
 fi
-
-. $GIT_PROMPT
-. $GIT_COMPLETION
