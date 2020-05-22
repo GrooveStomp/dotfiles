@@ -1,0 +1,4 @@
+# NOTE: On OSX you need to do:
+# brew install reattach-to-user-namespace
+# OSX Copy-paste integration
+set-option -g default-command "reattach-to-user-namespace -l bash"

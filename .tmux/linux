@@ -1,0 +1,11 @@
+# fool the multiplexers into thinking that the terminal has no "alternate
+# screen" mode (such as that used by pico, mutt, etc). This is accomplished by
+# setting termcap commands for the session.
+# The 'xterm*' part of the command should be set to whatever your
+# terminal-emulator is declared as.
+# The end result is that the overflow ends up in the terminal's scrollback
+# buffer instead of disappearing. Of course, since this is one static buffer,
+# things will get messy as you switch between screen or tmux windows, but this
+# is handy for quickly flicking up to see the output of an ls command or the
+# such.
+set-option -g terminal-overrides 'xterm*:smcup@:rmcup@'
