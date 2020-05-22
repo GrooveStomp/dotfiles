@@ -26,6 +26,15 @@ function start_ssh_agent {
     ssh-add
 }
 
+if [ -f "${SSH_ENV}" ]; then
+    . "${SSH_ENV}" > /dev/null
+    ps -ef | grep ${SSH_AGENT_PID} | grep [s]sh-agent$ > /dev/null || {
+        start_ssh_agent
+    }
+else
+    start_ssh_agent
+fi
+
 # OS-specific bash configuration
 . $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')
 

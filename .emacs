@@ -36,7 +36,9 @@
 ;; Onto config now
 ;;------------------------------------------------------------------------------
 
-(server-start) ; Run a daemon we can reattach to.
+;; Run an Emacs daemon we can reattach to.
+(load "server")
+(unless (server-running-p) (server-start))
 
 (global-unset-key "\C-h\C-n") ; Emacs news.
 (global-unset-key "\C-hn")    ; Emacs news.
@@ -251,7 +253,7 @@
       ))
 
 (menu-bar-mode -1)
-(set-face-attribute 'default nil :font "Cousine 13")
+(set-face-attribute 'default nil :font "Liberation Mono 13")
 
 ;; Configure file extensions with specific modes.
 (mapcar

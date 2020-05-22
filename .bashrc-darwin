@@ -5,12 +5,3 @@ MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh"
 
 MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash"
 [ -f "$MYDIR" ] && . "$MYDIR"
-
-if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    ps -ef | grep ${SSH_AGENT_PID} | grep [s]sh-agent$ > /dev/null || {
-        start_ssh_agent
-    }
-else
-    start_ssh_agent
-fi
