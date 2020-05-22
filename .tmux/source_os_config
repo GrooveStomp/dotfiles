@@ -1,0 +1,4 @@
+#!/bin/sh
+
+OS=$(uname | tr [:upper:] [:lower:])
+tmux source-file "$HOME/.tmux/$OS"
