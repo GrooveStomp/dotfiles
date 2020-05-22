@@ -32,6 +32,12 @@
    (unless (package-installed-p package)
      (package-install package)))
 
+;;------------------------------------------------------------------------------
+;; Onto config now
+;;------------------------------------------------------------------------------
+
+(server-start) ; Run a daemon we can reattach to.
+
 (global-unset-key "\C-h\C-n") ; Emacs news.
 (global-unset-key "\C-hn")    ; Emacs news.
 
@@ -139,6 +145,7 @@
  '(package-selected-packages
    (quote
     (string-inflection solarized-theme zig-mode yaml-mode birds-of-paradise-plus-theme gruvbox-theme autumn-light-theme org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit)))
+ '(pdf-view-midnight-colors (quote ("#fdf4c1" . "#32302f")))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
  '(rainbow-identifiers-choose-face-function (quote rainbow-identifiers-cie-l*a*b*-choose-face) t)
