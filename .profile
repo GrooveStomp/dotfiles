@@ -16,6 +16,8 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
+export PATH="/usr/local/go/bin:$PATH"
+
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/bin" ] ; then
     PATH="$HOME/bin:$PATH"
@@ -24,5 +26,4 @@ fi
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
 export EDITOR=emacs
-export GOPATH=~/code/go
 export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"

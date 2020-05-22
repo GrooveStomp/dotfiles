@@ -38,6 +38,7 @@
 
 (setq-default fill-column 80)
 (setq initial-major-mode 'org-mode)
+(setq ring-bell-fuction 'ignore)
 (setq initial-scratch-message "\
 # Scratch buffer, text-mode..
 # Remember, you are awesome. Stick with it!")
@@ -110,7 +111,7 @@
     ("fc0c179ce77997ecb6a7833310587131f319006ef2f630c5a1fec1a9307bff45" "227edf860687e6dfd079dc5c629cbfb5c37d0b42a3441f5c50873ba11ec8dfd2" "83faf27892c7119f6016e3609f346d3dae3516dede8fd8a5940373d98f615b4e" "0c29db826418061b40564e3351194a3d4a125d182c6ee5178c237a7364f0ff12" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "96998f6f11ef9f551b427b8853d947a7857ea5a578c75aa9c4e7c73fe04d10b4" "3cc2385c39257fed66238921602d8104d8fd6266ad88a006d0a4325336f5ee02" "72a81c54c97b9e5efcc3ea214382615649ebb539cb4f2fe3a46cd12af72c7607" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "5dd70fe6b64f3278d5b9ad3ff8f709b5e15cd153b0377d840c5281c352e8ccce" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" "58c6711a3b568437bab07a30385d34aacf64156cc5137ea20e799984f4227265" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" "e0d42a58c84161a0744ceab595370cbe290949968ab62273aed6212df0ea94b4" "e9776d12e4ccb722a2a732c6e80423331bcb93f02e089ba2a4b02e85de1cf00e" "3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" default)))
  '(package-selected-packages
    (quote
-    (org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit))))
+    (zig-mode org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -121,6 +122,7 @@
 
 ;; Custom functions.
 (load-library "~/.emacs.d/support.el")
+(load-library "~/.emacs.d/odin-mode.el")
 (windmove-default-keybindings)
 
 ; Bright-red TODOs
