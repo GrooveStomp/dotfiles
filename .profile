@@ -21,10 +21,12 @@ export SSH_ENV="$HOME/.ssh/env"
 export GOPATH="$HOME/code/go"
 export PATH="$HOME/bin:$PATH"
 
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 [ -d "/snap/bin" ] && export PATH="/snap/bin:$PATH"
 [ -d "$HOME/.cargo/bin" ] && export PATH="$HOME/.cargo/bin:$PATH"
 [ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
 [ -f "$HOME/bash.d/local-env-vars.sh" ] && . "$HOME/.bash.d/local-env-vars.sh"
+[ -d "$HOME/code/go/bin" ] && export PATH="$HOME/code/go/bin:$PATH"
 
 #-------------------------------------------------------------------------------
 # Aliases
