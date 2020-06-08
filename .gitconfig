@@ -1,5 +1,6 @@
 [user]
 	name = Aaron Oman
+  email = groovestomp@groovestomp.com
 [color]
 	ui = auto
 [diff]
@@ -8,3 +9,5 @@
 	plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [merge]
 	conflictstyle = diff3
+[include]
+  path = .gitconfig-local
