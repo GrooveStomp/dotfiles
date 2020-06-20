@@ -1,7 +1,14 @@
 #!/bin/sh
 
-DIR="/usr/share/git/completion/git-prompt.sh"
-[ -f "$DIR" ] && . "$DIR"
+MANJARO_DIR="/usr/share/git/completion/git-prompt.sh"
+POPOS_DIR="/etc/bash_completion.d/git-prompt"
 
-DIR="/usr/share/git/completion/git-completion.bash"
-[ -f "$DIR" ] && . "$DIR"
+if [ -f "$MANJARO_DIR" ]; then
+    . "$MANJARO_DIR"
+elif [ -f "$POPOS_DIR" ]; then
+    . "$POPOS_DIR"
+fi
+
+MANJARO_DIR="/usr/share/git/completion/git-completion.bash"
+
+[ -f "$MANJARO_DIR" ] && . "$MANJARO_DIR"

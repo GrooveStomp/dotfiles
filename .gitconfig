@@ -1,6 +1,6 @@
 [user]
 	name = Aaron Oman
-  email = groovestomp@groovestomp.com
+	email = groovestomp@groovestomp.com
 [color]
 	ui = auto
 [diff]
@@ -10,4 +10,4 @@
 [merge]
 	conflictstyle = diff3
 [include]
-  path = .gitconfig-local
+	path = .gitconfig-local
