@@ -44,6 +44,10 @@ if [ -f "/usr/local/share/chruby/chruby.sh" ]; then
     [ ! -z "$WANTED_RUBY_VERSION" ] && chruby "$WANTED_RUBY_VERSION"
 fi
 
+if [ ! "$(which terraform)" == "" ]; then
+    complete -C $(which terraform) terraform
+fi
+
 #-----------------------------------------------------------------------------
 # Setup bash colors.
 #

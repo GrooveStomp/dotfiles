@@ -1,6 +1,7 @@
 [user]
 	name = Aaron Oman
-	email = groovestomp@groovestomp.com
+	email = aaron.oman@gmail.com
+	signingkey = FF72573B382DCC43
 [color]
 	ui = auto
 [diff]
@@ -11,3 +12,9 @@
 	conflictstyle = diff3
 [include]
 	path = .gitconfig-local
+[commit]
+  gpgsign = true
+[gpg]
+	program = /usr/bin/gpg
+[init]
+	templateDir = /home/aaron/.git-template
