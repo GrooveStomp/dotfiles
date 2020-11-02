@@ -35,6 +35,17 @@ else
     start_ssh_agent
 fi
 
+# If there is an X Server running
+if [ xset q &>/dev/null ]; then
+    MACHINE="$(cat /sys/devices/virtual/dmi/id/sys_vendor | tr '[:upper:]' '[:lower:]')"
+    MACHINE="$MACHINE-$(cat /sys/devices/virtual/dmi/id/product_family | tr '[:upper:]' '[:lower:]')"
+    echo "machine: $MACHINE"
+
+    if [ -f "~/$MACHINE.xkb" ]; then
+        xkbcomp $MACHINE.xkb
+    fi
+fi
+
 # OS-specific bash configuration
 . $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')
 
@@ -44,7 +55,7 @@ if [ -f "/usr/local/share/chruby/chruby.sh" ]; then
     [ ! -z "$WANTED_RUBY_VERSION" ] && chruby "$WANTED_RUBY_VERSION"
 fi
 
-if [ ! "$(which terraform)" == "" ]; then
+if [ ! "$(which terraform 2>/dev/null)" == "" ]; then
     complete -C $(which terraform) terraform
 fi
 

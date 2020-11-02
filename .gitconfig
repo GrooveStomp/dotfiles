@@ -18,3 +18,12 @@
 	program = /usr/bin/gpg
 [init]
 	templateDir = /home/aaron/.git-template
+[sendemail]
+	smtpserver = smtp.gmail.com
+	smtpuser = aaron.oman@gmail.com
+	smtpencryption = tls
+	smtpserverport = 587
+[include]
+	path = .gitconfig-local
+[pull]
+	ff = only
