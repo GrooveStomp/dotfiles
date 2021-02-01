@@ -1,0 +1,42 @@
+set sendmail = "/usr/bin/msmtp -a gmail"
+set from = "aaron.oman@gmail.com"
+set realname = "Aaron Oman"
+set folder = "/disk2/mail/gmail" #"imaps://imap.gmail.com/"
+set spoolfile = "/disk2/mail/gmail/Inbox" #"+INBOX"
+set postponed = "/disk2/mail/gmail/Drafts" #"+Drafts"
+set record = "/disk2/mail/gmail/Sent" #"+Sent"
+set trash = "/disk2/mail/gmail/Trash" #"+Trash"
+set header_cache = "/disk2/mail/gmail/cache/headers" #~/.config/mutt/cache/headers/gmail
+set message_cachedir = "/disk2/mail/gmail/cache/messages" #~/.config/mutt/cache/messages/gmail
+set signature = "~/.config/mutt/sig-gmail"
+
+unmailboxes *
+mailboxes +Gmail
+mailboxes +--------
+mailboxes \
+    =Inbox \
+    =Drafts \
+    =Sent
+mailboxes -label "Spam" "[Gmail]/Spam"
+mailboxes \
+    =Trash \
+    =Archive
+
+mailboxes +--------
+
+mailboxes ="1729 MacGowan"
+mailboxes -label "2018 Home Sale" "1729 MacGowan/2018 Home Sale/Purchase"
+
+mailboxes \
+    ="Banking/Billing" \
+    =Communique \
+    =Communique/Amazon \
+    =Communique/Apple \
+    =Communique/Steam \
+    =Computing \
+    ="Computing/OpenBSD" \
+    ="Life Insurance" \
+    =linux \
+    =Memo \
+    =Subscriptions \
+    ="Tax Related"
