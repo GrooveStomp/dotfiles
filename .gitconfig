@@ -1,7 +1,6 @@
 [user]
 	name = Aaron Oman
 	email = aaron.oman@gmail.com
-	signingkey = FF72573B382DCC43
 [color]
 	ui = auto
 [diff]
@@ -10,19 +9,6 @@
 	plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 [merge]
 	conflictstyle = diff3
-[include]
-	path = .gitconfig-local
-[commit]
-  gpgsign = true
-[gpg]
-	program = /usr/bin/gpg
-[init]
-	templateDir = /home/aaron/.git-template
-[sendemail]
-	smtpserver = smtp.gmail.com
-	smtpuser = aaron.oman@gmail.com
-	smtpencryption = tls
-	smtpserverport = 587
 [include]
 	path = .gitconfig-local
 [pull]

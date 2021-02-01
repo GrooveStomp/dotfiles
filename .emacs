@@ -1,7 +1,7 @@
 ;; Global vars.
 (defvar *emacs-load-start* (current-time))
 
-(require 'cl)
+(setq byte-compile-warnings '(cl-functions))
 
 ;;------------------------------------------------------------------------------
 ;; Auto-install package dependencies
@@ -252,7 +252,7 @@
       ))
 
 (menu-bar-mode -1)
-(set-face-attribute 'default nil :font "Liberation Mono 12")
+(set-face-attribute 'default nil :font "Liberation Mono 16")
 
 ;; Configure file extensions with specific modes.
 (mapcar
@@ -265,10 +265,10 @@
 (defvar *finish-time* (current-time))
 (message "My .emacs loaded in %fs"
          (let (finish-time (current-time))
-           (- (+ (first *finish-time*)
-                 (second *finish-time*))
-              (+ (first *emacs-load-start*)
-                 (second *emacs-load-start*)))))
+           (- (+ (car *finish-time*)
+                 (cadr *finish-time*))
+              (+ (car *emacs-load-start*)
+                 (cadr *emacs-load-start*)))))
 (put 'narrow-to-region 'disabled nil)
 
 ;;------------------------------------------------------------------------------
@@ -317,9 +317,9 @@
             (setq aaron-agenda-files (find-lisp-find-files "~/notes" "\.org$"))
             ;; Filter out syncthing backed-up files.
             (setq aaron-agenda-files
-                  (remove-if (lambda (path)
-                               (string-match "\.stversions" path))
-                             aaron-agenda-files))
+                  (seq-remove (lambda (path)
+                                (string-match "\.stversions" path))
+                              aaron-agenda-files))
             ;; DEBUG: Show value of aaron-agenda-files
             ;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
             (setq org-agenda-files aaron-agenda-files)))
