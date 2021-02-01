@@ -12,11 +12,14 @@
         gruvbox-theme
         highlight-parentheses
         multi-term
+        neotree
         org-bullets
         paredit
+        terraform-mode
         tramp
         tree-mode
-        windata))
+        windata
+        zig-mode))
 
 (setq package-archives
       '(("elpa" . "http://tromey.com/elpa/")
@@ -83,6 +86,9 @@
       ;; Make normal search work like dired-isearch-filenames when in dired.
       dired-isearch-filenames t)
 
+(add-to-list 'backup-directory-alist
+             (cons tramp-file-name-regexp "~/.emacs-saves"))
+
 ;; Dependencies.
 (require 'paredit)
 ;(require 'highlight-parentheses)
@@ -90,7 +96,8 @@
 (require 'windata)
 (require 'multi-term)
 (require 'tramp)
-(require 'dirtree)
+;(require 'dirtree)
+(require 'neotree)
 ;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
@@ -114,7 +121,7 @@
  '(cua-read-only-cursor-color "#859900")
  '(custom-safe-themes
    (quote
-    ("123a8dabd1a0eff6e0c48a03dc6fb2c5e03ebc7062ba531543dfbce587e86f2a" "b583823b9ee1573074e7cbfd63623fe844030d911e9279a7c8a5d16de7df0ed0" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "2b9dc43b786e36f68a9fd4b36dd050509a0e32fe3b0a803310661edb7402b8b6" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "4b19d61c560a93ef90767abe513c11f236caec2864617d718aa366618133704c" "8e797edd9fa9afec181efbfeeebf96aeafbd11b69c4c85fa229bb5b9f7f7e66c" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "80ae3a89f1eca6fb94a525004f66b544e347c6f756aaafb728c7cdaef85ea1f5" "3e83abe75cebf5621e34ce1cbe6e12e4d80766bed0755033febed5794d0c69bf" "fc0c179ce77997ecb6a7833310587131f319006ef2f630c5a1fec1a9307bff45" "227edf860687e6dfd079dc5c629cbfb5c37d0b42a3441f5c50873ba11ec8dfd2" "83faf27892c7119f6016e3609f346d3dae3516dede8fd8a5940373d98f615b4e" "0c29db826418061b40564e3351194a3d4a125d182c6ee5178c237a7364f0ff12" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "96998f6f11ef9f551b427b8853d947a7857ea5a578c75aa9c4e7c73fe04d10b4" "3cc2385c39257fed66238921602d8104d8fd6266ad88a006d0a4325336f5ee02" "72a81c54c97b9e5efcc3ea214382615649ebb539cb4f2fe3a46cd12af72c7607" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "5dd70fe6b64f3278d5b9ad3ff8f709b5e15cd153b0377d840c5281c352e8ccce" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" "58c6711a3b568437bab07a30385d34aacf64156cc5137ea20e799984f4227265" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" "e0d42a58c84161a0744ceab595370cbe290949968ab62273aed6212df0ea94b4" "e9776d12e4ccb722a2a732c6e80423331bcb93f02e089ba2a4b02e85de1cf00e" "3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" default)))
+    ("939ea070fb0141cd035608b2baabc4bd50d8ecc86af8528df9d41f4d83664c6a" "c433c87bd4b64b8ba9890e8ed64597ea0f8eb0396f4c9a9e01bd20a04d15d358" "123a8dabd1a0eff6e0c48a03dc6fb2c5e03ebc7062ba531543dfbce587e86f2a" "b583823b9ee1573074e7cbfd63623fe844030d911e9279a7c8a5d16de7df0ed0" "8f97d5ec8a774485296e366fdde6ff5589cf9e319a584b845b6f7fa788c9fa9a" "2b9dc43b786e36f68a9fd4b36dd050509a0e32fe3b0a803310661edb7402b8b6" "d91ef4e714f05fff2070da7ca452980999f5361209e679ee988e3c432df24347" "4b19d61c560a93ef90767abe513c11f236caec2864617d718aa366618133704c" "8e797edd9fa9afec181efbfeeebf96aeafbd11b69c4c85fa229bb5b9f7f7e66c" "585942bb24cab2d4b2f74977ac3ba6ddbd888e3776b9d2f993c5704aa8bb4739" "80ae3a89f1eca6fb94a525004f66b544e347c6f756aaafb728c7cdaef85ea1f5" "3e83abe75cebf5621e34ce1cbe6e12e4d80766bed0755033febed5794d0c69bf" "fc0c179ce77997ecb6a7833310587131f319006ef2f630c5a1fec1a9307bff45" "227edf860687e6dfd079dc5c629cbfb5c37d0b42a3441f5c50873ba11ec8dfd2" "83faf27892c7119f6016e3609f346d3dae3516dede8fd8a5940373d98f615b4e" "0c29db826418061b40564e3351194a3d4a125d182c6ee5178c237a7364f0ff12" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "96998f6f11ef9f551b427b8853d947a7857ea5a578c75aa9c4e7c73fe04d10b4" "3cc2385c39257fed66238921602d8104d8fd6266ad88a006d0a4325336f5ee02" "72a81c54c97b9e5efcc3ea214382615649ebb539cb4f2fe3a46cd12af72c7607" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "5dd70fe6b64f3278d5b9ad3ff8f709b5e15cd153b0377d840c5281c352e8ccce" "8db4b03b9ae654d4a57804286eb3e332725c84d7cdab38463cb6b97d5762ad26" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" "58c6711a3b568437bab07a30385d34aacf64156cc5137ea20e799984f4227265" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" "e0d42a58c84161a0744ceab595370cbe290949968ab62273aed6212df0ea94b4" "e9776d12e4ccb722a2a732c6e80423331bcb93f02e089ba2a4b02e85de1cf00e" "3b0a350918ee819dca209cec62d867678d7dac74f6195f5e3799aa206358a983" default)))
  '(highlight-changes-colors (quote ("#d33682" "#6c71c4")))
  '(highlight-symbol-colors
    (--map
@@ -144,7 +151,7 @@
     ("#dc322f" "#cb4b16" "#b58900" "#546E00" "#B4C342" "#00629D" "#2aa198" "#d33682" "#6c71c4")))
  '(package-selected-packages
    (quote
-    (string-inflection solarized-theme zig-mode yaml-mode birds-of-paradise-plus-theme gruvbox-theme autumn-light-theme org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit)))
+    (bison-mode gemini-mode systemd nginx-mode treemacs neotree projectile markdown-mode terraform-mode prettier-js org-time-budgets svelte-mode string-inflection solarized-theme zig-mode yaml-mode birds-of-paradise-plus-theme gruvbox-theme autumn-light-theme org-bullets mellow-theme darktooth-theme labburn-theme rust-mode borland-blue-theme d-mode sublime-themes railscasts-theme color-theme-tango go-mode color-theme-monokai highlight-parentheses paredit)))
  '(pdf-view-midnight-colors (quote ("#fdf4c1" . "#32302f")))
  '(pos-tip-background-color "#eee8d5")
  '(pos-tip-foreground-color "#586e75")
@@ -234,13 +241,7 @@
 ;; Enable/Disable font-lock. (Syntax highlighting.)
 (global-font-lock-mode 1)
 
-;; Color Themes
-;; https://github.com/owainlewis/emacs-color-themes
-;; (add-to-list 'custom-theme-load-path "~/.emacs.d/elpa/sublime-themes-20160111.122/")
-;; (cond ((and (use-theme-p) (display-graphic-p))
-;;        (load-theme 'mellow t)) ; GUI theme.
-;;       ((use-theme-p)
-;;        (load-theme 'labburn t))) ; TUI theme.
+;; Theme
 (load-theme 'gruvbox-dark-soft t)
 
 ;; GUI Options.
@@ -251,7 +252,7 @@
       ))
 
 (menu-bar-mode -1)
-(set-face-attribute 'default nil :font "Liberation Mono 13")
+(set-face-attribute 'default nil :font "Liberation Mono 12")
 
 ;; Configure file extensions with specific modes.
 (mapcar
@@ -274,7 +275,7 @@
 ;; Major Mode Hooks
 ;;------------------------------------------------------------------------------
 
-(add-hook 'json-mode-hook
+(add-hook 'js-mode-hook
           (lambda ()
             (setq js-indent-level 2)))
 
