@@ -32,17 +32,13 @@
 alias rm='rm -i'
 alias bc='bc -l'
 
-alias em="emacs -nw -q"
-alias vi="emacs -nw -q"
-alias vim="emacs -nw -q"
-
 alias grep='grep --line-buffered'
 alias dirs='dirs -v'
 
 #-------------------------------------------------------------------------------
 # Env vars and PATH
 #-------------------------------------------------------------------------------
-export EDITOR="emacs -nw"
+export EDITOR="ng"
 export SSH_ENV="$HOME/.ssh/env"
 
 [ -d "$HOME/go" ] && export GOPATH="$HOME/go"
