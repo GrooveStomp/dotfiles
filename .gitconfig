@@ -18,3 +18,5 @@
 	program = /usr/bin/gpg
 [init]
 	templateDir = /home/aaron/.git-template
+[pull]
+	ff = only
