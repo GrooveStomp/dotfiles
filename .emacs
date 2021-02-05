@@ -3,7 +3,12 @@
 
 (setq byte-compile-warnings '(cl-functions))
 
-(package-initialize)
+;; For newer emacsen we don't need package-initialize.
+;; (emacs-version): "GNU Emacs 27.1 (build 1, x86_64-apple-darwin18.7.0, NS appkit-1671.60 Version 10.14.6 (Build 18G95))
+(let* ((version-parts (split-string (emacs-version)))
+       (version (string-to-number (car (cdr (cdr version-parts))))))
+  (if (< version 27)
+      (package-initialize)))
 
 ;;------------------------------------------------------------------------------
 ;; Auto-install package dependencies
