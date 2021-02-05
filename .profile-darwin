@@ -1,2 +1,4 @@
 [ -d "/usr/local/opt/llvm/bin" ] && export PATH="/usr/local/opt/llvm/bin:$PATH"
 export GPG_TTY=$(tty)
+export BASH_SILENCE_DEPRECATION_WARNING=1
+export EDITOR=mg
