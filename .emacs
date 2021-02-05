@@ -3,6 +3,8 @@
 
 (setq byte-compile-warnings '(cl-functions))
 
+(package-initialize)
+
 ;;------------------------------------------------------------------------------
 ;; Auto-install package dependencies
 ;;------------------------------------------------------------------------------
@@ -261,14 +263,6 @@
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
 
-;; Finish calculating total load time for .emacs.
-(defvar *finish-time* (current-time))
-(message "My .emacs loaded in %fs"
-         (let (finish-time (current-time))
-           (- (+ (car *finish-time*)
-                 (cadr *finish-time*))
-              (+ (car *emacs-load-start*)
-                 (cadr *emacs-load-start*)))))
 (put 'narrow-to-region 'disabled nil)
 
 ;;------------------------------------------------------------------------------
@@ -323,3 +317,22 @@
             ;; DEBUG: Show value of aaron-agenda-files
             ;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
             (setq org-agenda-files aaron-agenda-files)))
+
+;;------------------------------------------------------------------------------
+;; Site-local configuration.
+;;------------------------------------------------------------------------------
+(if (file-exists-p "~/.emacs.d/local.el")
+    (load-library "~/.emacs.d/local.el"))
+
+;;------------------------------------------------------------------------------
+;; Finish recording time to boot.
+;;------------------------------------------------------------------------------
+
+;; Finish calculating total load time for .emacs.
+(defvar *finish-time* (current-time))
+(message "My .emacs loaded in %fs"
+         (let (finish-time (current-time))
+           (- (+ (car *finish-time*)
+                 (cadr *finish-time*))
+              (+ (car *emacs-load-start*)
+                 (cadr *emacs-load-start*)))))
