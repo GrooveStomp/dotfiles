@@ -47,9 +47,10 @@ export SSH_ENV="$HOME/.ssh/env"
 [ -f "$HOME/.local/env" ] && . $HOME/.local/env
 
 #-------------------------------------------------------------------------------
-# OS-specific configuration
+# OS-specific configuration and environment-specific customization
 #-------------------------------------------------------------------------------
 # eg.,: .profile-linux, .profile-darwin
 . $HOME/.profile-$(uname | tr '[:upper:]' '[:lower:]')
+[ -d "$HOME/.profile-local" ] && . $HOME/.profile-local
 
 . $HOME/.bashrc
