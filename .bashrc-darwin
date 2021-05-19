@@ -6,6 +6,4 @@ MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-prompt.sh"
 MYDIR="/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash"
 [ -f "$MYDIR" ] && . "$MYDIR"
 
-source /usr/local/opt/chruby/share/chruby/chruby.sh
-
-source /usr/local/opt/chruby/share/chruby/auto.sh
+eval "$(rbenv init -)"

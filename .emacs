@@ -3,6 +3,8 @@
 
 (setq byte-compile-warnings '(cl-functions))
 
+(desktop-save-mode 1)
+
 ;; For newer emacsen we don't need package-initialize.
 ;; (emacs-version): "GNU Emacs 27.1 (build 1, x86_64-apple-darwin18.7.0, NS appkit-1671.60 Version 10.14.6 (Build 18G95))
 (let* ((version-parts (split-string (emacs-version)))
@@ -16,6 +18,7 @@
 (setq package-list
       '(dirtree
         go-mode
+        exec-path-from-shell
         gruvbox-theme
         highlight-parentheses
         multi-term
@@ -26,7 +29,8 @@
         tramp
         tree-mode
         windata
-        zig-mode))
+        zig-mode
+        vterm))
 
 (setq package-archives
       '(("elpa" . "http://tromey.com/elpa/")
@@ -44,24 +48,20 @@
 ;; Onto config now
 ;;------------------------------------------------------------------------------
 
-;; Run an Emacs daemon we can reattach to.
-(load "server")
-(unless (server-running-p) (server-start))
+(require'exec-path-from-shell)
+(when (or (memq window-system '(mac ns x))
+          (daemonp))
+  (exec-path-from-shell-initialize))
 
 (global-unset-key "\C-h\C-n") ; Emacs news.
 (global-unset-key "\C-hn")    ; Emacs news.
 
-(setq-default fill-column 80)
-(setq initial-major-mode 'org-mode)
-(setq initial-scratch-message "\
-# Scratch buffer, text-mode..
-# Remember, you are awesome. Stick with it!")
+(setq-default fill-column 110)
+;(setq initial-major-mode 'org-mode)
+;(setq initial-scratch-message "\
+;# Scratch buffer, text-mode..
+;# Remember, you are awesome. Stick with it!")
 (setq ring-bell-function 'ignore)
-
-;; ELPA Package manager setup.
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
 
 ;; Always follow symlinks.
 (setq vc-follow-symlinks t)
@@ -105,6 +105,7 @@
 (require 'tramp)
 ;(require 'dirtree)
 (require 'neotree)
+(require 'vterm)
 ;(require 'auto-complete-exuberant-ctags)
 (autoload 'dirtree "dirtree" "Add directory to tree view" t)
 
@@ -193,6 +194,7 @@
 
 ;; Custom functions.
 (load-library "~/.emacs.d/support.el")
+(load-library "~/.emacs.d/visws.el")
 
 (windmove-default-keybindings)
 
@@ -235,6 +237,7 @@
 (global-set-key (kbd "M-n")     'forward-paragraph)
 (global-set-key (kbd "M-p")     'backward-paragraph)
 (global-set-key (kbd "M-Q")     'unfill-paragraph)
+(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 
 ;; Enable/Disable font-lock. (Syntax highlighting.)
 (global-font-lock-mode 1)
@@ -246,8 +249,7 @@
 (if (display-graphic-p)
     (progn
       (scroll-bar-mode -1)
-      (tool-bar-mode -1)
-      ))
+      (tool-bar-mode -1)))
 
 (menu-bar-mode -1)
 (set-face-attribute 'default nil :font "Liberation Mono 16")
@@ -255,11 +257,17 @@
 ;; Configure file extensions with specific modes.
 (mapcar
  (lambda (file-ext) (add-to-list 'auto-mode-alist `(,file-ext . lisp-mode)))
- '("\\.emacs$" "\\.cl$" "\\.asd$" "\\.el$"))
+ '("\\.cl$" "\\.lisp$" "\\.asd$"))
+
+(mapcar
+ (lambda (file-ext) (add-to-list 'auto-mode-alist `(,file-ext . emacs-lisp-mode)))
+ '("\\.emacs$" "\\.el$"))
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode)) ; Not needed since Emacs 22.2?
 
 (put 'narrow-to-region 'disabled nil)
+
+(setq mastodon-instance-url "https://social.linux.pizza")
 
 ;;------------------------------------------------------------------------------
 ;; Major Mode Hooks
@@ -313,6 +321,38 @@
             ;; DEBUG: Show value of aaron-agenda-files
             ;; (mapcar (lambda (path) (message path)) aaron-agenda-files)
             (setq org-agenda-files aaron-agenda-files)))
+
+;;------------------------------------------------------------------------------
+;; mu4e configuration.
+;;------------------------------------------------------------------------------
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu/mu4e")
+(require 'mu4e)
+
+(setq mu4e-mu-binary "/usr/local/bin/mu"
+      sendmail-program "/usr/local/bin/msmtp" ; Use the default account.
+      send-mail-function 'smtpmail-send-it
+      message-sendmail-f-is-evil t
+      message-sendmail-extra-arguments '("--read-envelope-from")
+      message-send-mail-function 'message-send-mail-with-sendmail
+      mail-user-agent 'mu4e-user-agent
+      user-mail-address "aaron.oman@mogo.ca"
+      user-full-name "Aaron Oman"
+      mu4e-get-mail-command "mbsync -a"
+      mu4e-compose-reply-to-address "aaron.oman@mogo.ca")
+
+(defvar my-mu4e-account-alist
+  '(("Mogo"
+     (mu4e-sent-folder "~/mail/mogo/Saved Items")
+     (mu4e-drafts-folder "~/mail/mogo/Drafts")
+     (user-mail-address "aaron.oman@mogo.ca")
+     (user-full-name "Aaron Oman")
+     (sendmail-program "/usr/local/bin/msmtp -a mogo"))
+    ("Disroot"
+     (mu4e-sent-folder "~/mail/disroot/Saved Items")
+     (mu4e-drafts-folder "~/mail/disroot/Drafts")
+     (user-mail-address "groovestomp@disroot.org")
+     (user-full-name "GrooveStomp")
+     (sendmail-program "/usr/local/bin/msmtp -a disroot"))))
 
 ;;------------------------------------------------------------------------------
 ;; Site-local configuration.

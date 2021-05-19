@@ -49,12 +49,6 @@ fi
 # OS-specific bash configuration
 . $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')
 
-if [ -f "/usr/local/share/chruby/chruby.sh" ]; then
-    . /usr/local/share/chruby/chruby.sh
-    [ -d "$HOME/.rubies" ] && RUBIES+=("$HOME/.rubies/*")
-    [ ! -z "$WANTED_RUBY_VERSION" ] && chruby "$WANTED_RUBY_VERSION"
-fi
-
 if [ ! "$(which terraform 2>/dev/null)" == "" ]; then
     complete -C $(which terraform) terraform
 fi

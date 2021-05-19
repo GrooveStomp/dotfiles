@@ -51,6 +51,21 @@ export SSH_ENV="$HOME/.ssh/env"
 #-------------------------------------------------------------------------------
 # eg.,: .profile-linux, .profile-darwin
 . $HOME/.profile-$(uname | tr '[:upper:]' '[:lower:]')
-[ -d "$HOME/.profile-local" ] && . $HOME/.profile-local
+[ -f "$HOME/.profile-local" ] && . $HOME/.profile-local
 
 . $HOME/.bashrc
+
+# De-duplicate elements in $PATH
+if [ -n "$PATH" ]; then
+    old_PATH=$PATH:; PATH=
+    while [ -n "$old_PATH" ]; do
+        x=${old_PATH%%:*}       # the first remaining entry
+        case $PATH: in
+            *:"$x":*) ;;          # already there
+            *) PATH=$PATH:$x;;    # not there yet
+        esac
+        old_PATH=${old_PATH#*:}
+    done
+    PATH=${PATH#:}
+    unset old_PATH x
+fi

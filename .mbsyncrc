@@ -1,0 +1,45 @@
+IMAPAccount mogo
+Host outlook.office365.com
+User aaron.oman@mogo.ca
+Timeout 60
+PassCmd "cat ~/.config/mbsync/mogo"
+SSLType IMAPS
+#CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore mogo-remote
+Account mogo
+
+MaildirStore mogo-local
+SubFolders Verbatim
+Path ~/mail/mogo
+Inbox ~/mail/mogo/INBOX
+
+Channel mogo
+Far :mogo-remote:
+Near :mogo-local:
+Patterns *
+Create Both
+SyncState *
+
+IMAPAccount disroot
+Host disroot.org
+User GrooveStomp
+Timeout 60
+PassCmd "cat ~/.config/mbsync/disroot"
+SSLType IMAPS
+#CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore disroot-remote
+Account disroot
+
+MaildirStore disroot-local
+SubFolders Verbatim
+Path ~/mail/disroot
+Inbox ~/mail/disroot/Inbox
+
+Channel disroot
+Far :disroot-remote:
+Near :disroot-local:
+Patterns *
+Create Both
+SyncState *
