@@ -1,45 +1,101 @@
+#-------------------------------------------------------------------------------
+# Mogo
+#-------------------------------------------------------------------------------
 IMAPAccount mogo
 Host outlook.office365.com
 User aaron.oman@mogo.ca
 Timeout 60
 PassCmd "cat ~/.config/mbsync/mogo"
 SSLType IMAPS
-#CertificateFile /etc/ssl/certs/ca-certificates.crt
 
 IMAPStore mogo-remote
 Account mogo
 
 MaildirStore mogo-local
 SubFolders Verbatim
-Path ~/mail/mogo
-Inbox ~/mail/mogo/INBOX
+Path /disk2/mail/mogo/
+Inbox /disk2/mail/mogo/INBOX
 
 Channel mogo
-Far :mogo-remote:
-Near :mogo-local:
+Master :mogo-remote:
+Slave :mogo-local:
 Patterns *
 Create Both
 SyncState *
 
+#-------------------------------------------------------------------------------
+# Disroot
+#-------------------------------------------------------------------------------
 IMAPAccount disroot
 Host disroot.org
 User GrooveStomp
 Timeout 60
 PassCmd "cat ~/.config/mbsync/disroot"
 SSLType IMAPS
-#CertificateFile /etc/ssl/certs/ca-certificates.crt
 
 IMAPStore disroot-remote
 Account disroot
 
 MaildirStore disroot-local
 SubFolders Verbatim
-Path ~/mail/disroot
-Inbox ~/mail/disroot/Inbox
+Path /disk2/mail/disroot/
+Inbox /disk2/mail/disroot/Inbox
 
 Channel disroot
-Far :disroot-remote:
-Near :disroot-local:
+Master :disroot-remote:
+Slave :disroot-local:
 Patterns *
+Create Both
+SyncState *
+
+#-------------------------------------------------------------------------------
+# Protonmail
+#-------------------------------------------------------------------------------
+IMAPAccount protonmail
+Host 127.0.0.1
+Port 1143
+User groovestomp@groovestomp.com
+PassCmd "cat ~/.config/mbsync/protonmail"
+Timeout 60
+SSLType NONE
+
+IMAPStore protonmail-remote
+Account protonmail
+
+MaildirStore protonmail-local
+SubFolders Verbatim
+Path /disk2/mail/protonmail/
+Inbox /disk2/mail/protonmail/Inbox
+
+Channel protonmail
+Master :protonmail-remote:
+Slave :protonmail-local:
+Patterns *
+Create Both
+SyncState *
+
+#-------------------------------------------------------------------------------
+# aarondee2011@gmail.com
+#-------------------------------------------------------------------------------
+IMAPAccount aarondee
+Host imap.gmail.com
+User aarondee2011@gmail.com
+Timeout 60
+PassCmd "cat ~/.config/mbsync/aarondee"
+SSLType IMAPS
+AuthMechs LOGIN
+
+IMAPStore aarondee-remote
+Account aarondee
+
+MaildirStore aarondee-local
+SubFolders Verbatim
+Path /disk2/mail/aarondee/
+Inbox /disk2/mail/aarondee/INBOX
+
+Channel aarondee
+Master :aarondee-remote:
+Slave :aarondee-local:
+Patterns * !"[Gmail]/All Mail" !"[Gmail]/Important" !"[Gmail]/Starred" !"[Gmail]/Bin"
 Create Both
 SyncState *
