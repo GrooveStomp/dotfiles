@@ -1,8 +1,3 @@
-(defvar my-mu4e-maildir
-  (if (file-directory-p "/disk2/mail")
-      "/disk2/mail/"
-    "~/mail/"))
-
 (setq mu4e-mu-binary (locate-file "mu" exec-path)
       sendmail-program (locate-file "msmtp" exec-path)
       send-mail-function 'smtpmail-send-it

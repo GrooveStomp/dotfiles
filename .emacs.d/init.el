@@ -16,13 +16,13 @@
 
 ;; Now on towards the regular configuration.
 
-(global-unset-key "\C-h\C-n") ; Disable emacs news
-(global-unset-key "\C-hn") ; Disable emacs news
+(define-key global-map (kbd "C-h C-n") nil) ; Disable emacs news
+(define-key global-map (kbd "C-h n") nil) ; Disable emacs news
 
-(global-set-key (kbd "M-q")     'fill-paragraph)
-(global-set-key (kbd "M-n")     'forward-paragraph)
-(global-set-key (kbd "M-p")     'backward-paragraph)
-(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
+(define-key global-map (kbd "M-q") 'fill-paragraph)
+(define-key global-map (kbd "M-n") 'forward-paragraph)
+(define-key global-map (kbd "M-p") 'backward-paragraph)
+(define-key global-map (kbd "C-x C-b") 'ibuffer-other-window)
 
 (transient-mark-mode t)
 (global-font-lock-mode 1)
@@ -63,11 +63,10 @@
 (use-package seq
   :straight (:type built-in))
 (use-package find-lisp)
-(use-package org)
-(use-package org-bullets
-  :requires (org find-lisp)
+(use-package org
+  :mode ("\\.org$" . org-mode)
+  :requires (find-lisp)
   :config
-  (org-bullets-mode -1)
   (org-indent-mode 1)
   (local-set-key "\C-cl" 'org-store-link)
   (local-set-key "\C-ca" 'org-agenda)
@@ -79,12 +78,14 @@
         org-src-fontify-natively t
         org-src-tab-acts-natively t
         org-src-window-setup 'current-window
-        ; Get initial list of agenda files.
+        ;; Get initial list of agenda files.
         aaron-agenda-files-unfiltered (find-lisp-find-files "~/notes" "\.org$")
         aaron-agenda-files (seq-remove (lambda (path)
                                          (string-match "\.stversions" path))
                                        aaron-agenda-files-unfiltered)
         org-agenda-files aaron-agenda-files))
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
 (use-package magit)
 (use-package go-mode
   :mode ("\\.go$" . go-mode)
@@ -109,8 +110,13 @@
         c-basic-offset 8)
   (c-set-offset 'case-label '+)) ; Make case statements in switch blocks indent nicely.
 (use-package smtpmail)
-(use-package mu4e
-  :straight (:type built-in))
+(use-package mu4e ; Only load this way for OSX
+  :if (memq window-system '(mac ns x))
+  :straight nil
+  :load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e/")
+(use-package mu4e ; Load this way for every other OS
+  :if (not (memq window-system '(mac ns x)))
+  :straight nil)
 (use-package lisp-mode
   :straight (:type built-in)
   :mode (("\\.cl$" . lisp-mode) ("\\.lisp$" . lisp-mode) ("\\.asd$" . lisp-mode)))
