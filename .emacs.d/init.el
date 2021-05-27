@@ -55,6 +55,11 @@
 
 (straight-use-package 'use-package)
 
+(use-package tramp
+  :straight nil
+  :config
+  (setq tramp-default-method "sshx")
+  (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp "~/.emacs-saves")))
 (use-package seq
   :straight (:type built-in))
 (use-package find-lisp)
