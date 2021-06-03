@@ -24,16 +24,21 @@
 (define-key global-map (kbd "M-p") 'backward-paragraph)
 (define-key global-map (kbd "C-x C-b") 'ibuffer-other-window)
 
+(desktop-save-mode 1)
+(windmove-default-keybindings)
 (transient-mark-mode t)
 (global-font-lock-mode 1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
 (menu-bar-mode -1)
 (set-face-attribute 'default nil :font "Liberation Mono 13")
 (put 'narrow-to-region 'disabled nil)
 (show-paren-mode t)
 
-(setq-default column-number-mode t ; Show column numbesr
+;; Only run this elisp when we're using a gui.
+(when (display-graphic-p)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1))
+
+(setq-default column-number-mode t ; Show column numbers.
               indent-line-function 'insert-tab
               indent-tabs-mode nil
               inhibit-startup-screen t ; Disable splash screen
@@ -62,15 +67,12 @@
   (add-to-list 'backup-directory-alist (cons tramp-file-name-regexp "~/.emacs-saves")))
 (use-package seq
   :straight (:type built-in))
-(use-package find-lisp)
 (use-package org
   :mode ("\\.org$" . org-mode)
-  :requires (find-lisp)
+  :bind (("C-c l" . org-store-link)
+         ("C-c a" . org-agenda))
   :config
   (org-indent-mode 1)
-  (local-set-key "\C-cl" 'org-store-link)
-  (local-set-key "\C-ca" 'org-agenda)
-  (local-set-key "\C-cb" 'org-iswitchb)
   (setq org-log-done 'time
         org-todo-keywords
         '((sequence "TODO" "STARTED" "WAITING" "DEFERRED" "|" "DONE" "CANCELLED"))
@@ -78,12 +80,8 @@
         org-src-fontify-natively t
         org-src-tab-acts-natively t
         org-src-window-setup 'current-window
-        ;; Get initial list of agenda files.
-        aaron-agenda-files-unfiltered (find-lisp-find-files "~/notes" "\.org$")
-        aaron-agenda-files (seq-remove (lambda (path)
-                                         (string-match "\.stversions" path))
-                                       aaron-agenda-files-unfiltered)
-        org-agenda-files aaron-agenda-files))
+        org-agenda-files '("~/notes/agenda.org"
+                           "~/notes/mogo.org")))
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 (use-package magit)
@@ -93,7 +91,6 @@
 (use-package highlight-parentheses)
 (use-package gruvbox-theme
   :config (load-theme 'gruvbox-dark-soft t))
-(use-package windata)
 (use-package zig-mode
   :mode ("\\.zig$" . zig-mode))
 (use-package exec-path-from-shell
@@ -109,14 +106,6 @@
   (setq tab-width 8
         c-basic-offset 8)
   (c-set-offset 'case-label '+)) ; Make case statements in switch blocks indent nicely.
-(use-package smtpmail)
-(use-package mu4e ; Only load this way for OSX
-  :if (memq window-system '(mac ns x))
-  :straight nil
-  :load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e/")
-(use-package mu4e ; Load this way for every other OS
-  :if (not (memq window-system '(mac ns x)))
-  :straight nil)
 (use-package lisp-mode
   :straight (:type built-in)
   :mode (("\\.cl$" . lisp-mode) ("\\.lisp$" . lisp-mode) ("\\.asd$" . lisp-mode)))
@@ -149,14 +138,29 @@
   (global-set-key (kbd "C-c C-l") 'support-copy-line)
   (global-set-key (kbd "C-c C-p") 'support-copy-paragraph)
   (global-set-key (kbd "M-Q")     'support-unfill-paragraph))
+(use-package smtpmail)
+(use-package mu4e ; Only load this way for OSX
+  :if (memq window-system '(mac ns x))
+  :straight nil
+  :load-path "/usr/local/Cellar/mu/1.4.15/share/emacs/site-lisp/mu/mu4e/"
+  :config (setq mu4e-change-filenames-when-moving t))
+(use-package mu4e ; Load this way for every other OS
+  :if (not (memq window-system '(mac ns x)))
+  :straight nil)
+(use-package mu4e-maildirs-extension
+  :requires (mu4e))
 (use-package my-mu4e
   :requires (mu4e smtpmail)
   :straight nil
   :load-path "~/.emacs.d/packages/"
   :hook (mu4e-compose-pre . my-mu4e-set-account))
 (use-package mastodon
-  :straight (:type git :host github :repo "jdenen/mastodon.el")
   :config (setq mastodon-instance-url "https://social.linux.pizza"))
+(use-package erc
+  :straight nil
+  :config
+  (setq erc-nick "groovestomp"
+        erc-user-full-name "GrooveStomp"))
 
 ;; Site-local configuration.
 

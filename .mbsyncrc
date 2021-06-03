@@ -42,34 +42,8 @@ Path /disk2/mail/disroot/
 Inbox /disk2/mail/disroot/Inbox
 
 Channel disroot
-Master :disroot-remote:
-Slave :disroot-local:
-Patterns *
-Create Both
-SyncState *
-
-#-------------------------------------------------------------------------------
-# Protonmail
-#-------------------------------------------------------------------------------
-IMAPAccount protonmail
-Host 127.0.0.1
-Port 1143
-User groovestomp@groovestomp.com
-PassCmd "cat ~/.config/mbsync/protonmail"
-Timeout 60
-SSLType NONE
-
-IMAPStore protonmail-remote
-Account protonmail
-
-MaildirStore protonmail-local
-SubFolders Verbatim
-Path /disk2/mail/protonmail/
-Inbox /disk2/mail/protonmail/Inbox
-
-Channel protonmail
-Master :protonmail-remote:
-Slave :protonmail-local:
+Far :disroot-remote:
+Near :disroot-local:
 Patterns *
 Create Both
 SyncState *
