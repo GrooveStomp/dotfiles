@@ -14,7 +14,7 @@
       mu4e-compose-reply-to-address "groovestomp@disroot.org")
 
 (defvar my-mu4e-account-alist
-  '(("mogo"
+  '(("work"
      (mu4e-sent-folder "/mogo/Saved Items")
      (mu4e-drafts-folder "/mogo/Drafts")
      (mu4e-trash-folder "/mogo/Trash")
@@ -24,7 +24,7 @@
      (mu4e-get-mail-command "mbsync mogo")
      (mu4e-compose-reply-to-address "aaron.oman@mogo.ca"))
 
-    ("disroot"
+    ("personal"
      (mu4e-sent-folder "/disroot/Saved Items")
      (mu4e-drafts-folder "/disroot/Drafts")
      (mu4e-trash-folder "/disroot/Trash")
@@ -34,15 +34,28 @@
      (mu4e-get-mail-command "mbsync disroot")
      (mu4e-compose-reply-to-address "groovestomp@disroot.org"))
 
-    ("aarondee"
+    ("family"
      (mu4e-sent-folder "/aarondee/Saved Items")
      (mu4e-drafts-folder "/aarondee/Drafts")
      (mu4e-trash-folder "/aarondee/Trash")
      (mu4e-refile-folder "/aarondee/Archive")
-     (user-mail-address "aaron.oman@aarondee.ca")
+     (user-mail-address "aarondee2011@gmail.com")
      (user-full-name "Aaron & Daniela")
      (mu4e-get-mail-command "mbsync aarondee")
      (mu4e-compose-reply-to-address "aarondee2011@gmail.com"))))
+
+;; (setq mu4e-contexts
+;;       `( ,(make-mu4e-context
+;;            :name "disroot"
+;;            :match-func (lambda (msg)
+;;                          (when msg
+;;                            (mu4e-message-contact-field-matches msg :to '("groovestomp.*@disroot.org"
+;;                                                                          "groovestomp.*@getgoogleoff.me"
+;;                                                                          ".+@aaronoman.com"
+;;                                                                          ".+@groovestomp.com"))))
+;;            :vars '((user-mail-address . "groovestomp@disroot.org")
+;;                    (user-full-name "Aaron Oman")
+;;                    (mu4e-compose-signature . "GrooveStomp")))))
 
 (defun my-mu4e-set-account ()
   "Set the account for composing a message."
@@ -73,9 +86,7 @@
               "aaron.oman@mogo.ca")
              ((mu4e-message-contact-field-matches msg :to "aaron@aaronoman.com")
               "aaron@aaronoman.com")
-             ((mu4e-message-contact-field-matches msg :to "@groovestomp.com")
-              "groovestomp@groovestomp.com")
-             ((mu4e-message-contact-field matches msg :to "groovestomp@disroot.org")
+             ((mu4e-message-contact-field-matches msg :to "groovestomp@groovestomp.com")
               "groovestomp@groovestomp.com")
              ((mu4e-message-contact-field matches msg :to "aaron.oman.*@gmail.com")
               "groovestomp@groovestomp.com"))))))

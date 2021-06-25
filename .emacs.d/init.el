@@ -161,6 +161,7 @@
   :config
   (setq erc-nick "groovestomp"
         erc-user-full-name "GrooveStomp"))
+(use-package multi-vterm)
 
 ;; Site-local configuration.
 

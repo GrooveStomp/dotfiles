@@ -13,12 +13,12 @@ Account mogo
 
 MaildirStore mogo-local
 SubFolders Verbatim
-Path /disk2/mail/mogo/
-Inbox /disk2/mail/mogo/INBOX
+Path ~/mail/mogo/
+Inbox ~/mail/mogo/INBOX
 
 Channel mogo
-Master :mogo-remote:
-Slave :mogo-local:
+Far :mogo-remote:
+Near :mogo-local:
 Patterns *
 Create Both
 SyncState *
@@ -38,8 +38,8 @@ Account disroot
 
 MaildirStore disroot-local
 SubFolders Verbatim
-Path /disk2/mail/disroot/
-Inbox /disk2/mail/disroot/Inbox
+Path ~/mail/disroot/
+Inbox ~/mail/disroot/Inbox
 
 Channel disroot
 Master :disroot-remote:
@@ -64,12 +64,12 @@ Account aarondee
 
 MaildirStore aarondee-local
 SubFolders Verbatim
-Path /disk2/mail/aarondee/
-Inbox /disk2/mail/aarondee/INBOX
+Path ~/mail/aarondee/
+Inbox ~/mail/aarondee/INBOX
 
 Channel aarondee
-Master :aarondee-remote:
-Slave :aarondee-local:
+Far :aarondee-remote:
+Near :aarondee-local:
 Patterns * !"[Gmail]/All Mail" !"[Gmail]/Important" !"[Gmail]/Starred" !"[Gmail]/Bin"
 Create Both
 SyncState *
