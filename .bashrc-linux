@@ -1,29 +1,16 @@
 #!/bin/sh
 
+# Setup git-prompt
 MANJARO_DIR="/usr/share/git/completion/git-prompt.sh"
 POPOS_DIR="/etc/bash_completion.d/git-prompt"
-
 if [ -f "$MANJARO_DIR" ]; then
     . "$MANJARO_DIR"
 elif [ -f "$POPOS_DIR" ]; then
     . "$POPOS_DIR"
 fi
 
+# setup git-completion
 MANJARO_DIR="/usr/share/git/completion/git-completion.bash"
-
 [ -f "$MANJARO_DIR" ] && . "$MANJARO_DIR"
 
-function start_ssh_agent {
-    ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-}
-
-if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    ps -ef | grep ${SSH_AGENT_PID} | grep [s]sh-agent$ > /dev/null || {
-        start_ssh_agent
-    }
-else
-    start_ssh_agent
-fi
+eval `keychain -q --agents ssh --eval id_rsa`

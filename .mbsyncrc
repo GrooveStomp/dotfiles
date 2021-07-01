@@ -42,8 +42,8 @@ Path ~/mail/disroot/
 Inbox ~/mail/disroot/Inbox
 
 Channel disroot
-Master :disroot-remote:
-Slave :disroot-local:
+Far :disroot-remote:
+Near :disroot-local:
 Patterns *
 Create Both
 SyncState *
