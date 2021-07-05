@@ -46,6 +46,8 @@ export SSH_ENV="$HOME/.ssh/env"
 [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 [ -f "$HOME/.local/env" ] && . $HOME/.local/env
 
+export CODE_PATH="$HOME/code"
+
 #-------------------------------------------------------------------------------
 # OS-specific configuration and environment-specific customization
 #-------------------------------------------------------------------------------

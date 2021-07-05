@@ -162,6 +162,14 @@
   (setq erc-nick "groovestomp"
         erc-user-full-name "GrooveStomp"))
 (use-package multi-vterm)
+(use-package term
+  :straight nil
+  :hook (term-mode-hook . (lambda ()
+                            (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
+                            (setq-local mouse-yank-at-point t)
+                            (setq-local transient-mark-mode nil)
+                            (auto-fill-mode -1)
+                            (setq tab-width 8))))
 
 ;; Site-local configuration.
 

@@ -31,6 +31,8 @@ if [ xset q &>/dev/null ]; then
     fi
 fi
 
+eval `keychain -q --agents ssh --eval id_rsa`
+
 # OS-specific bash configuration
 . $HOME/.bashrc-$(uname | tr '[:upper:]' '[:lower:]')
 
@@ -46,6 +48,7 @@ else
     eval $(gpg-agent --daemon)
 fi
 
+# Terraform
 if [ ! "$(which terraform 2>/dev/null)" == "" ]; then
     complete -C $(which terraform) terraform
 fi
