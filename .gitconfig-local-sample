@@ -1,15 +1,15 @@
 [user]
-	name = Aaron Oman
-	email = aaron.oman@gmail.com
-	signingkey = DB275419ACED7EC40407A42F04F9253A2AF30293
+  name = Aaron Oman
+  email = aaron.oman@gmail.com
+  signingkey = DB275419ACED7EC40407A42F04F9253A2AF30293
 [gpg]
   program = /bin/gpg
 [init]
-	templateDir = /home/aaron/.git-template
+  templateDir = /home/aaron/.git-template
 [sendemail]
-	smtpserver = smtp.gmail.com
-	smtpuser = aaron.oman@gmail.com
-	smtpencryption = tls
-	smtpserverport = 587
+  smtpserver = smtp.gmail.com
+  smtpuser = aaron.oman@gmail.com
+  smtpencryption = tls
+  smtpserverport = 587
 [commit]
   gpgsign = true
